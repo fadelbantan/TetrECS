@@ -9,5 +9,8 @@
         <module name="tetrecs" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="tetrecs" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>
