@@ -12,7 +12,7 @@ import javafx.beans.property.SimpleIntegerProperty;
  *
  * The Grid contains functions related to modifying the model, for example, placing a piece inside the grid.
  *
- * The Grid should be linked to a GameBoard for it's display.
+ * The Grid should be linked to a GameBoard for its display.
  */
 public class Grid {
 
@@ -103,4 +103,56 @@ public class Grid {
         return rows;
     }
 
+    /**
+     *  Returns true or false if a GamePiece can be played or not
+     * @param piece GamePiece
+     * @param placeX x
+     * @param placeY y
+     * @return false if piece cannot be played
+     */
+    public boolean canPlayPiece(GamePiece piece, int placeX, int placeY) {
+        placeX -= 1;
+        placeY -= 1;
+        int[][] blocks = piece.getBlocks();
+        // Iterate over each component of the game piece
+        for (int x = 0; x < blocks.length; x++) {
+            for (int y = 0; y < blocks[x].length; y++) {
+                int value = blocks[x][y];
+                // If there's no block, ignore it
+                if (value == 0) continue;
+                int gridValue = get(x + placeX, y + placeY);
+                if (gridValue > 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     *
+     Given the x and y of the grid, a GamePiece is positioned within the grid
+     * @param piece GamePiece
+     * @param placeX x
+     * @param placeY y
+     * @return true when a piece is played
+     */
+    public boolean playPiece(GamePiece piece, int placeX, int placeY) {
+        if (!canPlayPiece(piece, placeX, placeY)) {
+            return false;
+        }
+        placeX -= 1;
+        placeY -= 1;
+        int[][] blocks = piece.getBlocks();
+        // Iterate over each component of the game piece
+        for (int x = 0; x < blocks.length; x++) {
+            for (int y = 0; y < blocks[x].length; y++) {
+                int value = blocks[x][y];
+                // If there's no block, ignore it
+                if (value == 0) continue;
+                set(x + placeX, y + placeY, value);
+            }
+        }
+        return true;
+    }
 }
