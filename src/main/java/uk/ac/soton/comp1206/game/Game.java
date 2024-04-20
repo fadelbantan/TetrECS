@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
+import uk.ac.soton.comp1206.ui.Multimedia;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -92,9 +93,11 @@ public class Game {
         if (grid.playPiece(currentPiece, x, y)) {
             afterPiece();
             nextPiece();
+        } else {
+            Multimedia.playAudio("fail.wav");
         }
         /**
-         * Check for lines  to clear
+         * Check for lines to clear
          */
         afterPiece();
     }
