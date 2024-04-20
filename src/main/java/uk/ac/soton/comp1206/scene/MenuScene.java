@@ -1,5 +1,7 @@
 package uk.ac.soton.comp1206.scene;
 
+import javafx.animation.Animation;
+import javafx.animation.RotateTransition;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -8,6 +10,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.App;
@@ -48,13 +51,20 @@ public class MenuScene extends BaseScene {
         var mainPane = new BorderPane();
         menuPane.getChildren().add(mainPane);
 
-        // Logo
+        // Better title
         Image image = new Image((getClass().getResource("/images/TetrECS.png").toExternalForm()));
         ImageView logo = new ImageView(image);
 
         logo.setFitHeight(130);
         logo.setPreserveRatio(true);
         mainPane.setCenter(logo);
+
+        // Title Animation
+        RotateTransition rotate = new RotateTransition(Duration.millis(2000), logo);
+        rotate.setToAngle(5);
+        rotate.setFromAngle(-5);
+        rotate.setCycleCount(Animation.INDEFINITE);
+        rotate.play();
 
         // Menu items
         var menu = new VBox(10);
@@ -65,6 +75,7 @@ public class MenuScene extends BaseScene {
         var local = new Text("Local");
         local.getStyleClass().add("menuItem");
         menu.getChildren().add(local);
+        local.setOnMouseClicked(e -> gameWindow.startChallenge());
 
         var online = new Text("Online");
         online.getStyleClass().add("menuItem");
