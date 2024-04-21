@@ -5,6 +5,8 @@ import javafx.scene.media.MediaPlayer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Objects;
+
 public class Multimedia {
     private static final Logger logger = LogManager.getLogger(Multimedia.class);
     public static MediaPlayer musicPlayer;
@@ -15,7 +17,7 @@ public class Multimedia {
      * @param music music name
      */
     public static void playMusic(String music) {
-        String toPlay = Multimedia.class.getResource("/music/" + music).toExternalForm();
+        String toPlay = Multimedia.class.getResource("resources/music/" + music).toExternalForm();
         musicPlayer = new MediaPlayer(new Media(toPlay));
         musicPlayer.play();
         logger.info("Music played: " + music);
@@ -26,7 +28,7 @@ public class Multimedia {
      * @param sound sound name
      */
     public static void playAudio(String sound) {
-        String toPlay = Multimedia.class.getResource("/sounds/" + sound).toExternalForm();
+        String toPlay = Objects.requireNonNull(Multimedia.class.getResource("resources/sounds/" + sound)).toExternalForm();
         audioPlayer = new MediaPlayer(new Media(toPlay));
         audioPlayer.play();
         logger.info("Audio played: " + sound);
