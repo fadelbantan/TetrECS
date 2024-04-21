@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.ui.Multimedia;
+import uk.ac.soton.comp1206.event.NextPieceListener;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -40,6 +41,8 @@ public class Game {
      * Track what the current piece is
      */
     private GamePiece currentPiece;
+    private GamePiece nextPiece;
+
 
     /**
      *  Initial values
@@ -75,21 +78,20 @@ public class Game {
      */
     public void initialiseGame() {
         logger.info("Initialising game");
+        nextPiece = spawnPiece();
+        nextPiece();
     }
 
     /**
      * Handle what should happen when a particular block is clicked
+     *
      * @param gameBlock the block that was clicked
      */
     public void blockClicked(GameBlock gameBlock) {
         //Get the position of this block
         int x = gameBlock.getX();
         int y = gameBlock.getY();
-
-
-        /**
-         * Place the current piece
-         */
+        //Place the current piece
         if (grid.playPiece(currentPiece, x, y)) {
             afterPiece();
             nextPiece();
@@ -181,7 +183,9 @@ public class Game {
      * After placing, replace the piece with a new piece
      */
     public void nextPiece() {
-        currentPiece = spawnPiece();
+        currentPiece = nextPiece;
+        nextPiece = spawnPiece();
+        NextPieceListener.nextPiece(currentPiece, nextPiece);
     }
 
     /**

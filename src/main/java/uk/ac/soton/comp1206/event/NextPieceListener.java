@@ -4,6 +4,9 @@ import uk.ac.soton.comp1206.game.GamePiece;
 
 public interface NextPieceListener {
 
-    public void nextPiece(GamePiece current, GamePiece next);
+    public static void nextPiece(GamePiece currentGamePiece, GamePiece nextGamePiece) {
+
+    }
+
 
 }

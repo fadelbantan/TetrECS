@@ -1,17 +1,20 @@
 package uk.ac.soton.comp1206.component;
 
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.event.BlockClickedListener;
+import uk.ac.soton.comp1206.event.RightClickListener;
+import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.game.Grid;
 
 /**
  * A GameBoard is a visual component to represent the visual GameBoard.
  * It extends a GridPane to hold a grid of GameBlocks.
  *
- * The GameBoard can hold an internal grid of it's own, for example, for displaying an upcoming block. It also be
+ * The GameBoard can hold an internal grid of its own, for example, for displaying an upcoming block. It also be
  * linked to an external grid, for the main game board.
  *
  * The GameBoard is only a visual representation and should not contain game logic or model logic in it, which should
@@ -55,6 +58,7 @@ public class GameBoard extends GridPane {
      * The listener to call when a specific block is clicked
      */
     private BlockClickedListener blockClickedListener;
+    private RightClickListener rightClickListener;
 
 
     /**
@@ -142,8 +146,14 @@ public class GameBoard extends GridPane {
         //Add to our block directory
         blocks[x][y] = block;
 
-        //Link the GameBlock component to the corresponding value in the Grid
-        block.bind(grid.getGridProperty(x,y));
+        //Add a mouse click handler to the block to trigger GameBoard blockClicked method and rightClicked method
+        block.setOnMouseClicked((e) -> {
+            if(e.getButton() == MouseButton.PRIMARY) {
+                blockClicked(e, block);
+            } else {
+                rightClicked(e, block);
+            }
+        });
 
         //Add a mouse click handler to the block to trigger GameBoard blockClicked method
         block.setOnMouseClicked((e) -> blockClicked(e, block));
@@ -171,5 +181,24 @@ public class GameBoard extends GridPane {
             blockClickedListener.blockClicked(block);
         }
     }
+
+    public void setOnRightClicked(RightClickListener rightClickedListener) {
+        this.rightClickListener = rightClickedListener;
+    }
+
+    private void rightClicked(MouseEvent event, GameBlock block) {
+        logger.info("Block Right clicked: {}", block);
+
+        if(rightClickListener != null) {
+            rightClickListener.setOnRightClick(block);
+        }
+    }
+
+    public void pieceToDisplay(GamePiece gamePiece) {
+        this.grid.clean();
+        this.grid.playPiece(gamePiece, 1,1);
+    }
+
+
 
 }
