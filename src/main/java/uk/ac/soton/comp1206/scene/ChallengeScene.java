@@ -10,6 +10,7 @@ import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.component.GameBoard;
 import uk.ac.soton.comp1206.component.PieceBoard;
 import uk.ac.soton.comp1206.game.Game;
+import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
 import uk.ac.soton.comp1206.ui.Multimedia;
@@ -130,7 +131,7 @@ public class ChallengeScene extends BaseScene {
         // Incoming piece
         var incomingText = new Text("Incoming");
         incomingText.getStyleClass().add("heading");
-        currentPiece = new PieceBoard(100,100);
+        currentPiece = new PieceBoard(GamePiece.createPiece(i), 100,100);
         currentPiece.getStyleClass().add("gameBox");
 
         rightBar.getChildren().addAll(highScoreText, highScoreNum, levelText, levelNum, multiplierText, multiplierNum, incomingText, currentPiece);

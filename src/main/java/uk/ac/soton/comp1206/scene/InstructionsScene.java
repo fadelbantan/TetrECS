@@ -11,6 +11,7 @@ import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBoard;
+import uk.ac.soton.comp1206.component.PieceBoard;
 import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
@@ -18,6 +19,8 @@ import uk.ac.soton.comp1206.ui.GameWindow;
 public class InstructionsScene extends BaseScene {
 
     private static final Logger logger = LogManager.getLogger(MenuScene.class);
+
+    private GridPane gridPane = new GridPane();
     /**
      * Create a new scene, passing in the GameWindow the scene will be displayed in
      *
@@ -88,6 +91,25 @@ public class InstructionsScene extends BaseScene {
         gridPane.setLayoutX(160);
         gridPane.setVgap(10);
         gridPane.setHgap(10);
+    }
+
+    /**
+     * Creates the 15 game pieces' grids
+     */
+    public void createDynamicPieces() {
+        int i = 0;
+        while (i <= 14) {
+            int a = 0;
+            while (a <= 4) {
+                int b = 0;
+                while (b <= 2) {
+                    gridPane.add(new PieceBoard(GamePiece.createPiece(i), 50, 50), a, b);
+                    i++;
+                    b++;
+                }
+                a++;
+            }
+        }
     }
 
 

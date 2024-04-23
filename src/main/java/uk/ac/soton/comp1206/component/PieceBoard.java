@@ -1,11 +1,10 @@
 package uk.ac.soton.comp1206.component;
 
-import uk.ac.soton.comp1206.component.GameBoard;
 import uk.ac.soton.comp1206.game.GamePiece;
 
 public class PieceBoard extends GameBoard {
 
-    public PieceBoard(double width, double height) {
+    public PieceBoard(GamePiece piece, double width, double height) {
         super(3, 3, width, height);
     }
 

@@ -41,6 +41,7 @@ public class Game {
      * Track what the current piece is
      */
     private GamePiece currentPiece;
+    protected GamePiece followingPiece;
     private GamePiece nextPiece;
 
 
@@ -63,6 +64,12 @@ public class Game {
 
         //Create a new grid model to represent the game state
         this.grid = new Grid(cols,rows);
+
+        // Current piece is spawned once the game is created
+        currentPiece =spawnPiece();
+
+        // Next piece is spawned as soon as the current piece iis
+        nextPiece = spawnPiece();
     }
 
     /**
@@ -78,7 +85,8 @@ public class Game {
      */
     public void initialiseGame() {
         logger.info("Initialising game");
-        nextPiece = spawnPiece();
+        currentPiece = spawnPiece();
+        followingPiece = spawnPiece();
         nextPiece();
     }
 
@@ -92,12 +100,14 @@ public class Game {
         int x = gameBlock.getX();
         int y = gameBlock.getY();
         //Place the current piece
-        if (grid.playPiece(currentPiece, x, y)) {
+        // If a piece cannot be played it should be remembered until the timer runs out
+        if (getGrid().canPlayPiece(currentPiece, x, y)) {
+            getGrid().playPiece(currentPiece, x, y);
             afterPiece();
             nextPiece();
-        } else {
+            Multimedia.playAudio("place.wav");
+        } else
             Multimedia.playAudio("fail.wav");
-        }
         /**
          * Check for lines to clear
          */
@@ -139,8 +149,6 @@ public class Game {
                 }
             }
         }
-
-
         // Check if lines cleared
         if (linesCleared > 0) {
             // Clear block
@@ -158,6 +166,19 @@ public class Game {
             // Multiplier resets to 1 if no lines cleared
             multiplier.set(1);
         }
+    }
+
+    public void rotateCurrentPiece() {
+        logger.info("The current piece {} has been rotated ", currentPiece.toString());
+        currentPiece.rotate();
+        NextPieceListener.nextPiece(currentPiece, nextPiece);
+    }
+
+    public void swapCurrentPiece() {
+        GamePiece gamePiece = currentPiece;
+        currentPiece = nextPiece;
+        nextPiece = gamePiece;
+        logger.info("Pieces swapped");
     }
 
     /**
