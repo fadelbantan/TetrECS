@@ -5,8 +5,8 @@ import javafx.beans.property.SimpleIntegerProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
-import uk.ac.soton.comp1206.ui.Multimedia;
 import uk.ac.soton.comp1206.event.NextPieceListener;
+import uk.ac.soton.comp1206.ui.Multimedia;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -45,6 +45,9 @@ public class Game {
     private GamePiece nextPiece;
 
 
+protected Multimedia multimedia = new Multimedia();
+
+protected NextPieceListener nextPieceListener;
     /**
      *  Initial values
      */
@@ -66,10 +69,26 @@ public class Game {
         this.grid = new Grid(cols,rows);
 
         // Current piece is spawned once the game is created
-        currentPiece =spawnPiece();
+        currentPiece = spawnPiece();
 
         // Next piece is spawned as soon as the current piece iis
         nextPiece = spawnPiece();
+    }
+
+    public IntegerProperty livesProperty() {
+        return lives;
+    }
+
+    public IntegerProperty scoreProperty() {
+        return score;
+    }
+
+    public IntegerProperty levelProperty() {
+        return level;
+    }
+
+    public IntegerProperty multiplierProperty() {
+        return multiplier;
     }
 
     /**
@@ -85,7 +104,6 @@ public class Game {
      */
     public void initialiseGame() {
         logger.info("Initialising game");
-        currentPiece = spawnPiece();
         followingPiece = spawnPiece();
         nextPiece();
     }
@@ -95,46 +113,41 @@ public class Game {
      *
      * @param gameBlock the block that was clicked
      */
-    public void blockClicked(GameBlock gameBlock) {
+    public boolean blockClicked(GameBlock gameBlock) {
         //Get the position of this block
         int x = gameBlock.getX();
         int y = gameBlock.getY();
         //Place the current piece
         // If a piece cannot be played it should be remembered until the timer runs out
-        if (getGrid().canPlayPiece(currentPiece, x, y)) {
-            getGrid().playPiece(currentPiece, x, y);
-            afterPiece();
+        if (grid.canPlayPiece(currentPiece, x, y)) {
+            grid.playPiece(currentPiece, x, y);
             nextPiece();
-            Multimedia.playAudio("place.wav");
-        } else
-            Multimedia.playAudio("fail.wav");
-        /**
-         * Check for lines to clear
-         */
-        afterPiece();
+            afterPiece();
+            return true;
+            //place.wav
+        } else {
+            return false;
+            //fail.wav
+        }
+    }
+
+    /**
+     * TODO HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+     * @param blocks
+     */
+    public void clear(HashSet<int[]> blocks) {
+        for (int[] block: blocks) {
+            grid.set(block[0], block[1], 0);
+        }
     }
 
     /**
      * Manages clearing the lines
      */
     public void afterPiece() {
-        var clear = new HashSet<IntegerProperty>();
         int linesCleared = 0;
+        HashSet<int[]> clearBlocks = new HashSet<>();
 
-        // Clearing vertical lines
-        for (int y = 0; y < rows; y++) {
-            int  counter = 0;
-            for (int x = 0; x < cols; x++) {
-                if (grid.get(x, y) == 0) break;
-                counter++;
-            }
-            if (counter == cols) {
-                linesCleared++;
-                for (int x = 0; x < this.cols; x++) {
-                    clear.add(grid.getGridProperty(x, y));
-                }
-            }
-        }
         // Clearing horizontal lines
         for (int x = 0; x < cols; x++) {
             int counter = 0;
@@ -145,40 +158,34 @@ public class Game {
             if (counter == rows) {
                 linesCleared++;
                 for (int y = 0; y < rows; y++) {
-                    clear.add(grid.getGridProperty(x, y));
+                    int[] coordinate = new int[] {x, y};
+                    clearBlocks.add(coordinate);
                 }
             }
         }
-        // Check if lines cleared
-        if (linesCleared > 0) {
-            // Clear block
-            for (IntegerProperty block : clear) {
-                block.set(0);
+
+        // Clearing vertical lines
+        for (int y = 0; y < rows; y++) {
+            int  counter = 0;
+            for (int x = 0; x < cols; x++) {
+                if (grid.get(x, y) == 0) break;
+                counter++;
             }
-            score(linesCleared, clear.size());
-
-            // Multiplier increase by 1 if the next piece also clears lines
-            multiplier.set(multiplier.add(1).get());
-
-            // Sets the level
-            level.set(Math.floorDiv(score.get(), 1000));
-        } else {
-            // Multiplier resets to 1 if no lines cleared
-            multiplier.set(1);
+            if (counter == cols) {
+                linesCleared++;
+                for (int x = 0; x < cols; x++) {
+                    int[] coordinate = new int[] {x, y};
+                    clearBlocks.add(coordinate);
+                }
+            }
         }
-    }
-
-    public void rotateCurrentPiece() {
-        logger.info("The current piece {} has been rotated ", currentPiece.toString());
-        currentPiece.rotate();
-        NextPieceListener.nextPiece(currentPiece, nextPiece);
-    }
-
-    public void swapCurrentPiece() {
-        GamePiece gamePiece = currentPiece;
-        currentPiece = nextPiece;
-        nextPiece = gamePiece;
-        logger.info("Pieces swapped");
+        if(linesCleared>0){
+            clear(clearBlocks);
+            score(linesCleared, clearBlocks.size());
+            this.multiplier.add(1);
+        } else {
+            this.multiplier.set(1);
+        }
     }
 
     /**
@@ -187,27 +194,36 @@ public class Game {
      * @param blocks number of grid blocks cleared
      */
     public void score(int lines, int blocks) {
-        int multiplayer = multiplier.get();
-        score.set(score.add(lines * blocks * 10 * multiplayer).get());
+        int scoreToAdd = lines * blocks * 10 * this.multiplier.get();
+        this.score.add(scoreToAdd);
+        int level = this.score.get() / 1000;
+        if (this.level.get() != level) {
+            this.level.set(level);
+        }
     }
 
-    /**
-     * Randomise generating the pieces
-     * @return GamePiece
-     */
-    public GamePiece spawnPiece() {
-        Random random = new Random();
-        return GamePiece.createPiece(random.nextInt(PIECES));
-    }
 
-    /**
-     * After placing, replace the piece with a new piece
-     */
-    public void nextPiece() {
-        currentPiece = nextPiece;
-        nextPiece = spawnPiece();
+    public void rotateCurrentPiece() {
+        logger.info("The current piece {} has been rotated ", currentPiece.toString());
+        currentPiece.rotate();
         NextPieceListener.nextPiece(currentPiece, nextPiece);
     }
+
+    public void swapCurrentPiece() {
+        GamePiece tempGamePiece = followingPiece;
+        followingPiece = nextPiece;
+        currentPiece = tempGamePiece;
+        logger.info("Pieces swapped");
+    }
+
+    public GamePiece getCurrentPiece() {
+        return currentPiece;
+    }
+
+    public GamePiece getFollowingPiece() {
+        return followingPiece;
+    }
+
 
     /**
      * Get the grid model inside this game representing the game state of the board
@@ -233,5 +249,80 @@ public class Game {
         return rows;
     }
 
+//    public GamePiece spawnPiece() {
+//        Random random = new Random();
+//        int randomNumber = random.nextInt(15);
+//        GamePiece gamePiece = GamePiece.createPiece(randomNumber);
+//        return gamePiece;
+//    }
+
+    /**
+     * Randomise generating the pieces
+     * @return GamePiece
+     */
+    public GamePiece spawnPiece() {
+        Random random = new Random();
+        GamePiece piece = GamePiece.createPiece(random.nextInt(PIECES));
+        return piece;
+    }
+
+    /**
+     * After placing, replace the piece with a new piece
+     */
+    public void nextPiece() {
+        currentPiece = followingPiece;
+        followingPiece = spawnPiece();
+        NextPieceListener.nextPiece(currentPiece, followingPiece);
+    }
+
+    public void setNextPieceListener(NextPieceListener nextPieceListener) {
+        this.nextPieceListener = nextPieceListener;
+    }
+
+    /**
+     * Skip current piece with 100 points
+     */
+//    public void skipPiece() {
+//        if (score.get() >= 50) {
+//            score.set(score.get() - 50);
+//            nextPiece();
+//            Multimedia.playAudio("transition.wav");
+//            logger.info("Skipped piece");
+//        } else {
+//            Multimedia.playAudio("fail.wav");
+//            logger.info("Not enough points");
+//        }
+//    }
+
+    /**
+     * Buy one life with 300 points
+     */
+//    public void addLives() {
+//        if (score.get() >= 100) {
+//            score.set(score.get() - 100);
+//            lives.set(lives.get() + 1);
+//            Multimedia.playAudio("lifegain.wav");
+//            logger.info("Added one life");
+//        } else {
+//            Multimedia.playAudio("fail.wav");
+//            logger.info("Not enough points");
+//        }
+//    }
+
+    /**
+     * Clear the whole grid with 500 points
+     */
+//    public void clearAll() {
+//        if (score.get() >= 200) {
+//            score.set(score.get() - 200);
+//            grid.clean();
+//            multiplier.set(multiplier.add(1).get());
+//            Multimedia.playAudio("explode.wav");
+//            logger.info("Grid cleaned");
+//        } else {
+//            Multimedia.playAudio("fail.wav");
+//            logger.info("Not enough points");
+//        }
+//    }
 
 }

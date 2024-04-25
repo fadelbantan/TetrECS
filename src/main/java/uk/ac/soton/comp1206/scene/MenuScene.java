@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
@@ -24,6 +25,8 @@ import uk.ac.soton.comp1206.ui.Multimedia;
 public class MenuScene extends BaseScene {
 
     private static final Logger logger = LogManager.getLogger(MenuScene.class);
+
+    private Multimedia multimedia = new Multimedia();
 
     /**
      * Create a new menu scene
@@ -60,12 +63,14 @@ public class MenuScene extends BaseScene {
         logo.setPreserveRatio(true);
         mainPane.setCenter(logo);
 
-        // Title Animation
+        // Better title animation
         RotateTransition rotate = new RotateTransition(Duration.millis(2000), logo);
         rotate.setToAngle(5);
         rotate.setFromAngle(-5);
         rotate.setCycleCount(Animation.INDEFINITE);
         rotate.play();
+
+        Multimedia.playMusic("menu.mp3");
 
         // Menu items
         var menu = new VBox(10);
@@ -91,6 +96,11 @@ public class MenuScene extends BaseScene {
         quit.setOnMouseClicked((e) -> App.getInstance().shutdown());
         menu.getChildren().add(quit);
 
+//        local.setOnAction(this::startGame);
+//        online.setOnAction(this::startMultiplayer);
+//        instructions.setOnAction(this::startInstructions);
+
+
     }
 
     /**
@@ -99,6 +109,14 @@ public class MenuScene extends BaseScene {
     @Override
     public void initialise() {
         Multimedia.playAudio("menu.mp3");
+
+        // Exit when escaped is pressed
+        scene.setOnKeyPressed(keyEvent -> {
+            if(keyEvent.getCode() == KeyCode.ESCAPE) {
+                logger.info("Escape Pressed");
+                System.exit(0);
+            }
+        });
     }
 
     /**
@@ -107,6 +125,14 @@ public class MenuScene extends BaseScene {
      */
     private void startGame(ActionEvent event) {
         gameWindow.startChallenge();
+        Multimedia.stopBackground();
+    }
+    private void startMultiplayer(ActionEvent event) {
+
     }
 
+    private void startInstructions(ActionEvent event) {
+        gameWindow.startInstructionsScene();
+        Multimedia.stopBackground();
+    }
 }

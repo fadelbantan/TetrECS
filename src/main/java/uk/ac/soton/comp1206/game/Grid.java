@@ -159,7 +159,7 @@ public class Grid {
     /**
      * Remove all blocks on grid
      */
-    public void clean() {
+    public void cleanGrid() {
         for (int x = 0; x < this.cols; x++) {
             for (int y = 0; y < this.rows; y++)
                 this.grid[x][y].set(0);

@@ -5,7 +5,7 @@ import uk.ac.soton.comp1206.component.GameBoard;
 
 public interface RightClickListener {
 
-    public void setOnRightClick(GameBlock block);
+    public void rightClick(GameBlock block);
 
 
 }

@@ -190,12 +190,12 @@ public class GameBoard extends GridPane {
         logger.info("Block Right clicked: {}", block);
 
         if(rightClickListener != null) {
-            rightClickListener.setOnRightClick(block);
+            rightClickListener.rightClick(block);
         }
     }
 
     public void pieceToDisplay(GamePiece gamePiece) {
-        this.grid.clean();
+        this.grid.cleanGrid();
         this.grid.playPiece(gamePiece, 1,1);
     }
 
