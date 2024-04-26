@@ -6,12 +6,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.component.GameBlockCoordinate;
+import uk.ac.soton.comp1206.event.GameLoopListener;
 import uk.ac.soton.comp1206.event.LineClearListener;
 import uk.ac.soton.comp1206.event.NextPieceListener;
-import uk.ac.soton.comp1206.ui.Multimedia;
 
 import java.util.HashSet;
 import java.util.Random;
+import java.util.Timer;
+import java.util.concurrent.*;
+
 
 import static uk.ac.soton.comp1206.game.GamePiece.*;
 
@@ -48,6 +51,11 @@ public class Game {
 
     protected NextPieceListener nextPieceListener;
     protected LineClearListener lineClearedListener;
+    protected GameLoopListener gameLoopListener;
+
+    protected ScheduledExecutorService timer;
+    protected int initialDelay = 12000;
+    protected ScheduledFuture<?> newLoop;
 
     /**
      *  Initial values
@@ -93,6 +101,7 @@ public class Game {
     public void start() {
         logger.info("Starting game");
         initialiseGame();
+        startLoop();
     }
 
     /**
@@ -102,6 +111,7 @@ public class Game {
         logger.info("Initialising game");
         followingPiece = spawnPiece();
         nextPiece();
+        timer = Executors.newSingleThreadScheduledExecutor();
     }
 
     /**
@@ -253,6 +263,10 @@ public class Game {
         this.lineClearedListener = lineClearedListener;
     }
 
+    public void setOnGameLoop(GameLoopListener gameLoopListener) {
+        this.gameLoopListener = gameLoopListener;
+    }
+
     public void rotateCurrentPiece() {
         logger.info("The current piece {} has been rotated ", currentPiece.toString());
         currentPiece.rotate();
@@ -272,6 +286,41 @@ public class Game {
 
     public GamePiece getFollowingPiece() {
         return followingPiece;
+    }
+
+    public int getTimerDelay() {
+        int delay = initialDelay - (500 * level.get());
+        return Math.max(delay, 2500);
+    }
+
+    public void gameLoop() {
+        nextPiece();
+        if(lives.get() == 1) {
+            lives.set(0);
+            endGame();
+        }
+        lives.set(lives.get() - 1);
+        multiplier.set(1);
+        if(gameLoopListener != null) {
+            gameLoopListener.gameLoop(getTimerDelay());
+        }
+        startLoop();
+    }
+
+    public void startLoop() {
+        newLoop = timer.schedule(this::gameLoop, getTimerDelay(), TimeUnit.MILLISECONDS);
+
+        gameLoopListener.gameLoop(getTimerDelay());
+    }
+
+    public void restartLoop() {
+        newLoop.cancel(false);
+        startLoop();
+    }
+
+    public void endGame() {
+        timer.shutdownNow();
+        logger.info("Game has ended");
     }
 
     /**

@@ -1,10 +1,16 @@
 package uk.ac.soton.comp1206.scene;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.geometry.Pos;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlockCoordinate;
@@ -37,6 +43,8 @@ public class ChallengeScene extends BaseScene {
     protected int blockX;
 
     protected int blockY;
+
+    protected Rectangle timer;
 
 
     /**
@@ -81,11 +89,13 @@ public class ChallengeScene extends BaseScene {
 
         challengePane.getChildren().add(statistics);
         statistics.setAlignment(Pos.TOP_CENTER);
+        statistics.setTranslateY(20);
 
         pieceBoard = new GameBoard(3,3,100,100);
         pieceBoard.setAlignment(Pos.CENTER);
 
         followingPieceBoard = new GameBoard(3,3,75,75);
+
         followingPieceBoard.setAlignment(Pos.CENTER);
         pieceBoard.setTranslateY(-10);
         pieceBoard.setTranslateX(12.5);
@@ -94,10 +104,17 @@ public class ChallengeScene extends BaseScene {
         pieces.setAlignment(Pos.CENTER_RIGHT);
         pieces.setTranslateX(-75);
 
+        timer = new Rectangle(gameWindow.getWidth(),10);
+
+        var timePane = new StackPane();
+        timePane.getChildren().add(timer);
+
         var mainPane = new BorderPane();
         challengePane.getChildren().add(mainPane);
 
         mainPane.setRight(pieces);
+        mainPane.setTop(timePane);
+        timePane.setAlignment(Pos.TOP_LEFT);
 
         board = new GameBoard(game.getGrid(),gameWindow.getWidth()/2,gameWindow.getWidth()/2);
         mainPane.setCenter(board);
@@ -109,6 +126,8 @@ public class ChallengeScene extends BaseScene {
         game.setNextPieceListener(this::nextPiece);
 
         game.setLineClearedListener(this::lineClear);
+
+        game.setOnGameLoop(this::gameLoop);
 
         // Setting Right Click Listener
         board.setOnRightClicked(this::rotate);
@@ -125,10 +144,11 @@ public class ChallengeScene extends BaseScene {
      * @param gameBlock the Game Block that was clocked
      */
     private void blockClicked(GameBlock gameBlock) {
-        Boolean piecePlayed = game.blockClicked(gameBlock);
+        boolean piecePlayed = game.blockClicked(gameBlock);
         if (piecePlayed) {
             multimedia.playAudio("place.wav");
             board.getBlock(blockX, blockY).paintCursor();
+            game.restartLoop();
         } else {
             multimedia.playAudio("fail.wav");
         }    }
@@ -192,7 +212,7 @@ public class ChallengeScene extends BaseScene {
     protected void keyboardInput(KeyEvent keyEvent) {
         int oldBlockX = blockX;
         int oldBlockY = blockY;
-        Boolean moved = false;
+        boolean moved = false;
 
         if(keyEvent.getCode() == KeyCode.ESCAPE) {
             multimedia.stopBackground();
@@ -239,8 +259,29 @@ public class ChallengeScene extends BaseScene {
             board.getBlock(blockX, blockY).paintCursor();
         }
     }
-    public void lineClear(Set<GameBlockCoordinate> gameBlockCoordinates) {
+    protected void lineClear(Set<GameBlockCoordinate> gameBlockCoordinates) {
         multimedia.playAudio("clear.wav");
         board.fadeOut(gameBlockCoordinates);
+    }
+
+    protected void gameLoop(int delay) {
+        timer.widthProperty().set(gameWindow.getWidth());
+        Timeline timerBar = createTimeLine(delay);
+        timerBar.play();
+    }
+
+    private Timeline createTimeLine(int delay) {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.ZERO, new KeyValue(timer.fillProperty(), Color.GREEN)));
+        timeline.getKeyFrames().add(new KeyFrame(Duration.ZERO, new KeyValue(timer.widthProperty(), timer.getWidth())));
+
+        timeline.getKeyFrames().add(new KeyFrame(Duration.millis(delay*0.5), new KeyValue(timer.fillProperty(), Color.YELLOW)));
+        timeline.getKeyFrames().add(new KeyFrame(Duration.millis(delay*0.5), new KeyValue(timer.widthProperty(), timer.getWidth()*0.75)));
+
+        timeline.getKeyFrames().add(new KeyFrame(Duration.millis(delay*0.75), new KeyValue(timer.fillProperty(), Color.RED)));
+        timeline.getKeyFrames().add(new KeyFrame(Duration.millis(delay*0.75), new KeyValue(timer.widthProperty(), timer.getWidth()*0.5)));
+
+        timeline.getKeyFrames().add(new KeyFrame(Duration.millis(delay), new KeyValue(timer.widthProperty(), 0)));
+
+        return timeline;
     }
 }
