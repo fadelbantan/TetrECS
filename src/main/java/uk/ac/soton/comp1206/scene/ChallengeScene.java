@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.component.GameBoard;
+import uk.ac.soton.comp1206.event.NextPieceListener;
 import uk.ac.soton.comp1206.game.Game;
 import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.ui.GamePane;
@@ -23,7 +24,7 @@ public class ChallengeScene extends BaseScene {
     private static final Logger logger = LogManager.getLogger(MenuScene.class);
     protected Game game;
 
-    private Multimedia multimedia = new Multimedia();
+    protected Multimedia multimedia = new Multimedia();
 
     protected GameBoard pieceBoard;
 
@@ -34,6 +35,7 @@ public class ChallengeScene extends BaseScene {
     protected int blockX;
 
     protected int blockY;
+
 
     /**
      * Create a new Single Player challenge scene
@@ -90,119 +92,29 @@ public class ChallengeScene extends BaseScene {
         pieces.setAlignment(Pos.CENTER_RIGHT);
         pieces.setTranslateX(-75);
 
-//        var stackPane = new StackPane();
-//        stackPane.getChildren().add(pieceBoard);
-//        stackPane.setAlignment(Pos.CENTER_RIGHT);
-//        challengePane.getChildren().add(stackPane);
-
         var mainPane = new BorderPane();
         challengePane.getChildren().add(mainPane);
 
-
-
-
-//        // Top
-//        var topBar = new HBox(200);
-//        topBar.setAlignment(Pos.CENTER);
-//        BorderPane.setMargin(topBar, new Insets(10, 0, 0, 0));
-//        mainPane.setTop(topBar);
-//
-//        // Score
-//        var scoreBox = new VBox();
-//        scoreBox.setAlignment(Pos.CENTER);
-//        var scoreText = new Text("Score");
-//        scoreText.getStyleClass().add("heading");
-//        var scoreNum = new Text();
-//        scoreNum.getStyleClass().add("score");
-//        scoreNum.textProperty().bind(game.score.asString());
-//        scoreBox.getChildren().addAll(scoreText, scoreNum);
-//
-//        // Title
-//        var title = new Text("Single Player");
-//        title.getStyleClass().add("title");
-//
-//        // Lives
-//        var livesBox = new VBox();
-//        livesBox.setAlignment(Pos.CENTER);
-//        var livesText = new Text("Lives");
-//        livesText.getStyleClass().add("heading");
-//        var livesNum = new Text();
-//        livesNum.getStyleClass().add("lives");
-//        livesNum.textProperty().bind(game.lives.asString());
-//        livesBox.getChildren().addAll(livesText, livesNum);
-//
-//        topBar.getChildren().addAll(scoreBox, title, livesBox);
-//
-//        /*
-//         Left
-//         */
-//        VBox leftBar = new VBox();
-//        leftBar.setAlignment(Pos.CENTER);
-//        leftBar.setPadding(new Insets(0, 0, 0, 20));
-//        mainPane.setLeft(leftBar);
-//
-//        // Test
-//        var test = new Text("test");
-//        test.getStyleClass().add("heading");
-//
-//        leftBar.getChildren().addAll(test);
-//
-//        /*
-//         Right
-//         */
-//        var rightBar = new VBox();
-//        rightBar.setAlignment(Pos.CENTER);
-//        rightBar.setPadding(new Insets(0, 20, 0, 0));
-//        mainPane.setRight(rightBar);
-//
-//        // High score
-//        var highScoreText = new Text("High Score");
-//        highScoreText.getStyleClass().add("heading");
-//        var highScoreNum = new Text();
-//        highScoreNum.getStyleClass().add("hiscore");
-//
-//        // Level
-//        var levelText = new Text("Level");
-//        levelText.getStyleClass().add("heading");
-//        var levelNum = new Text();
-//        levelNum.getStyleClass().add("level");
-//        levelNum.textProperty().bind(game.level.asString());
-//
-//        // Multiplier
-//        var multiplierText = new Text("Multiplier");
-//        multiplierText.getStyleClass().add("heading");
-//        var multiplierNum = new Text();
-//        multiplierNum.getStyleClass().add("heading");
-//        multiplierNum.textProperty().bind(game.multiplier.asString());
-//
-//        // Incoming piece
-//        var incomingText = new Text("Incoming");
-//        incomingText.getStyleClass().add("heading");
-//        //currentPiece = new PieceBoard(GamePiece.createPiece(), 100,100);
-//        currentPiece.getStyleClass().add("gameBox");
-//
-//        rightBar.getChildren().addAll(highScoreText, highScoreNum, levelText, levelNum, multiplierText, multiplierNum, incomingText, currentPiece);
-//        var board = new GameBoard(game.getGrid(), (float) gameWindow.getWidth() / 2, (float) gameWindow.getWidth() / 2);
-//        mainPane.setCenter(board);
+        mainPane.setRight(pieces);
 
         board = new GameBoard(game.getGrid(),gameWindow.getWidth()/2,gameWindow.getWidth()/2);
         mainPane.setCenter(board);
 
         //Handle block on GameBoard grid being clicked
         board.setOnBlockClick(this::blockClicked);
-    }
 
-    //Setting Piece Listener
-//        game.setNextPieceListener(this::nextPiece);
-//
-// Setting Right Clicked Listener
-//        board.setOnRightClicked(this::rotate);
-//
-//        pieceBoard.setOnBlockClick(this::rotate);
-//
-//        followingPieceBoard.setOnBlockClick(this::swapPieces);
-//
-//        scene.setOnKeyPressed(this::keyboardInput);
+        // Setting Piece Listener
+        game.setNextPieceListener(this.nextPiece);
+
+        // Setting Right Click Listener
+        board.setOnRightClicked(this::rotate);
+
+        pieceBoard.setOnBlockClick(this::rotate);
+
+        followingPieceBoard.setOnBlockClick(this::swapPieces);
+
+        scene.setOnKeyPressed(this::keyboardInput);
+    }
 
     /**
      * Handle when a block is clicked

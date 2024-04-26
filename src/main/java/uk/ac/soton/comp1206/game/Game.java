@@ -40,14 +40,13 @@ public class Game {
     /**
      * Track what the current piece is
      */
-    private GamePiece currentPiece;
+    protected GamePiece currentPiece;
     protected GamePiece followingPiece;
-    private GamePiece nextPiece;
 
+    protected Multimedia multimedia = new Multimedia();
 
-protected Multimedia multimedia = new Multimedia();
+    protected NextPieceListener nextPieceListener;
 
-protected NextPieceListener nextPieceListener;
     /**
      *  Initial values
      */
@@ -68,11 +67,6 @@ protected NextPieceListener nextPieceListener;
         //Create a new grid model to represent the game state
         this.grid = new Grid(cols,rows);
 
-        // Current piece is spawned once the game is created
-        currentPiece = spawnPiece();
-
-        // Next piece is spawned as soon as the current piece iis
-        nextPiece = spawnPiece();
     }
 
     public IntegerProperty livesProperty() {
@@ -117,7 +111,6 @@ protected NextPieceListener nextPieceListener;
         //Get the position of this block
         int x = gameBlock.getX();
         int y = gameBlock.getY();
-        //Place the current piece
         // If a piece cannot be played it should be remembered until the timer runs out
         if (grid.canPlayPiece(currentPiece, x, y)) {
             grid.playPiece(currentPiece, x, y);
@@ -202,29 +195,6 @@ protected NextPieceListener nextPieceListener;
         }
     }
 
-
-    public void rotateCurrentPiece() {
-        logger.info("The current piece {} has been rotated ", currentPiece.toString());
-        currentPiece.rotate();
-        NextPieceListener.nextPiece(currentPiece, nextPiece);
-    }
-
-    public void swapCurrentPiece() {
-        GamePiece tempGamePiece = followingPiece;
-        followingPiece = nextPiece;
-        currentPiece = tempGamePiece;
-        logger.info("Pieces swapped");
-    }
-
-    public GamePiece getCurrentPiece() {
-        return currentPiece;
-    }
-
-    public GamePiece getFollowingPiece() {
-        return followingPiece;
-    }
-
-
     /**
      * Get the grid model inside this game representing the game state of the board
      * @return game grid model
@@ -249,13 +219,6 @@ protected NextPieceListener nextPieceListener;
         return rows;
     }
 
-//    public GamePiece spawnPiece() {
-//        Random random = new Random();
-//        int randomNumber = random.nextInt(15);
-//        GamePiece gamePiece = GamePiece.createPiece(randomNumber);
-//        return gamePiece;
-//    }
-
     /**
      * Randomise generating the pieces
      * @return GamePiece
@@ -272,11 +235,33 @@ protected NextPieceListener nextPieceListener;
     public void nextPiece() {
         currentPiece = followingPiece;
         followingPiece = spawnPiece();
-        NextPieceListener.nextPiece(currentPiece, followingPiece);
+        nextPieceListener.nextPiece(currentPiece, followingPiece);
     }
 
     public void setNextPieceListener(NextPieceListener nextPieceListener) {
         this.nextPieceListener = nextPieceListener;
+    }
+
+
+    public void rotateCurrentPiece() {
+        logger.info("The current piece {} has been rotated ", currentPiece.toString());
+        currentPiece.rotate();
+
+    }
+
+    public void swapCurrentPiece() {
+        GamePiece tempGamePiece = followingPiece;
+        followingPiece = currentPiece;
+        currentPiece = tempGamePiece;
+        logger.info("Pieces swapped");
+    }
+
+    public GamePiece getCurrentPiece() {
+        return currentPiece;
+    }
+
+    public GamePiece getFollowingPiece() {
+        return followingPiece;
     }
 
     /**

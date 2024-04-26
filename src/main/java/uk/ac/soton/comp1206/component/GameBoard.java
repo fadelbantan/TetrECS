@@ -79,7 +79,7 @@ public class GameBoard extends GridPane {
     }
 
     /**
-     * Create a new GameBoard with it's own internal grid, specifying the number of columns and rows, along with the
+     * Create a new GameBoard with its own internal grid, specifying the number of columns and rows, along with the
      * visual width and height.
      *
      * @param cols number of columns for internal grid
@@ -99,7 +99,7 @@ public class GameBoard extends GridPane {
     }
 
     /**
-     * Get a specific block from the GameBoard, specified by it's row and column
+     * Get a specific block from the GameBoard, specified by its row and column
      * @param x column
      * @param y row
      * @return game block at the given column and row
@@ -154,10 +154,6 @@ public class GameBoard extends GridPane {
                 rightClicked(e, block);
             }
         });
-
-        //Add a mouse click handler to the block to trigger GameBoard blockClicked method
-        block.setOnMouseClicked((e) -> blockClicked(e, block));
-
         return block;
     }
 

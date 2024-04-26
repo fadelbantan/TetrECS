@@ -114,12 +114,15 @@ public class Grid {
         placeX -= 1;
         placeY -= 1;
         int[][] blocks = piece.getBlocks();
+
         // Iterate over each component of the game piece
         for (int x = 0; x < blocks.length; x++) {
             for (int y = 0; y < blocks[x].length; y++) {
+
                 int value = blocks[x][y];
                 // If there's no block, ignore it
                 if (value == 0) continue;
+
                 int gridValue = get(x + placeX, y + placeY);
                 if (gridValue != 0) {
                     return false;
@@ -137,23 +140,20 @@ public class Grid {
      * @param placeY y
      * @return true when a piece is played
      */
-    public boolean playPiece(GamePiece piece, int placeX, int placeY) {
-        if (!canPlayPiece(piece, placeX, placeY)) {
-            return false;
-        }
+    public void playPiece(GamePiece piece, int placeX, int placeY) {
         placeX -= 1;
         placeY -= 1;
         int[][] blocks = piece.getBlocks();
         // Iterate over each component of the game piece
         for (int x = 0; x < blocks.length; x++) {
             for (int y = 0; y < blocks[x].length; y++) {
+
                 int value = blocks[x][y];
                 // If there's no block, ignore it
                 if (value == 0) continue;
                 set(x + placeX, y + placeY, value);
             }
         }
-        return true;
     }
 
     /**
