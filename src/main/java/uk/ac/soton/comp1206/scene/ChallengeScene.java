@@ -7,14 +7,13 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import uk.ac.soton.comp1206.ui.Multimedia;
 import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.component.GameBoard;
-import uk.ac.soton.comp1206.event.NextPieceListener;
 import uk.ac.soton.comp1206.game.Game;
 import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
-import uk.ac.soton.comp1206.ui.Multimedia;
 
 /**
  * The Single Player challenge scene. Holds the UI for the single player challenge mode in the game.
@@ -104,7 +103,7 @@ public class ChallengeScene extends BaseScene {
         board.setOnBlockClick(this::blockClicked);
 
         // Setting Piece Listener
-        game.setNextPieceListener(this.nextPiece);
+        game.setNextPieceListener(this::nextPiece);
 
         // Setting Right Click Listener
         board.setOnRightClicked(this::rotate);

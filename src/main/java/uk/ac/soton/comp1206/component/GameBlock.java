@@ -10,11 +10,11 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * The Visual User Interface component representing a single block in the grid.
- *
+
  * Extends Canvas and is responsible for drawing itself.
- *
+
  * Displays an empty square (when the value is 0) or a coloured square depending on value.
- *
+
  * The GameBlock value should be bound to a corresponding block in the Grid model.
  */
 public class GameBlock extends Canvas {

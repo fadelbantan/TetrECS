@@ -43,7 +43,6 @@ public class Game {
     protected GamePiece currentPiece;
     protected GamePiece followingPiece;
 
-    protected Multimedia multimedia = new Multimedia();
 
     protected NextPieceListener nextPieceListener;
 

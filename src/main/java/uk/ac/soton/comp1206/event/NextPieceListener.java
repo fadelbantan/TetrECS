@@ -6,7 +6,4 @@ public interface NextPieceListener {
 
     void nextPiece(GamePiece nextGamePiece, GamePiece followingGamePiece);
 
-
-
-
 }

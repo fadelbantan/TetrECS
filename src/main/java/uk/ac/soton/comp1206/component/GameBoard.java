@@ -146,6 +146,9 @@ public class GameBoard extends GridPane {
         //Add to our block directory
         blocks[x][y] = block;
 
+        //Link the GameBlock component to the corresponding value in the Grid
+        block.bind(grid.getGridProperty(x,y));
+
         //Add a mouse click handler to the block to trigger GameBoard blockClicked method and rightClicked method
         block.setOnMouseClicked((e) -> {
             if(e.getButton() == MouseButton.PRIMARY) {
