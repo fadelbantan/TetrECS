@@ -70,7 +70,7 @@ public class MenuScene extends BaseScene {
         rotate.setCycleCount(Animation.INDEFINITE);
         rotate.play();
 
-        Multimedia.playMusic("menu.mp3");
+        multimedia.playMusic("menu.mp3");
 
         // Menu items
         var menu = new VBox(10);
@@ -108,7 +108,7 @@ public class MenuScene extends BaseScene {
      */
     @Override
     public void initialise() {
-        Multimedia.playAudio("menu.mp3");
+        multimedia.playAudio("menu.mp3");
 
         // Exit when escaped is pressed
         scene.setOnKeyPressed(keyEvent -> {
@@ -125,7 +125,7 @@ public class MenuScene extends BaseScene {
      */
     private void startGame(ActionEvent event) {
         gameWindow.startChallenge();
-        Multimedia.stopBackground();
+        multimedia.stopBackground();
     }
     private void startMultiplayer(ActionEvent event) {
 
@@ -133,6 +133,6 @@ public class MenuScene extends BaseScene {
 
     private void startInstructions(ActionEvent event) {
         gameWindow.startInstructionsScene();
-        Multimedia.stopBackground();
+        multimedia.stopBackground();
     }
 }

@@ -1,9 +1,9 @@
-//package uk.ac.soton.comp1206.event;
-//
-//import java.util.Set;
-//
-//public interface LineClearListener {
-//
-//    public void clearLine(Set<int[]> set);
-//
-//}
+package uk.ac.soton.comp1206.event;
+
+import uk.ac.soton.comp1206.component.GameBlockCoordinate;
+
+import java.util.Set;
+
+public interface LineClearListener {
+    void lineClear(Set<GameBlockCoordinate> gameBlockCoordinateSet);
+}

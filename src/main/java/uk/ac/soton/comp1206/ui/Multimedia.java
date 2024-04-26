@@ -17,7 +17,7 @@ public class Multimedia {
      * Play background music
      * @param music music name
      */
-    public static void playMusic(String music) {
+    public void playMusic(String music) {
         String toPlay = Multimedia.class.getResource("/music/" + music).toExternalForm();
         try {
             Media play = new Media(toPlay);
@@ -42,7 +42,7 @@ public class Multimedia {
      * Play audio effects
      * @param sound sound name
      */
-    public static void playAudio(String sound) {
+    public void playAudio(String sound) {
         String toPlay = Objects.requireNonNull(Multimedia.class.getResource("resources/sounds/" + sound)).toExternalForm();
         try {
             Media play = new Media(toPlay);
@@ -59,7 +59,7 @@ public class Multimedia {
     /**
      * Stopping background music
      */
-    public static void stopBackground() {
+    public void stopBackground() {
         backgroundPlayer.stop();
         logger.info("Background Music Stopped");
     }
