@@ -3,6 +3,8 @@ package uk.ac.soton.comp1206.scene;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -11,6 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlockCoordinate;
@@ -22,6 +25,11 @@ import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.Set;
 
 /**
@@ -29,7 +37,7 @@ import java.util.Set;
  */
 public class ChallengeScene extends BaseScene {
 
-    private static final Logger logger = LogManager.getLogger(MenuScene.class);
+    private static final Logger logger = LogManager.getLogger(ChallengeScene.class);
     protected Game game;
 
     protected Multimedia multimedia = new Multimedia();
@@ -43,6 +51,8 @@ public class ChallengeScene extends BaseScene {
     protected int blockX;
 
     protected int blockY;
+
+    public SimpleIntegerProperty highScoreValue = new SimpleIntegerProperty(0);
 
     protected Rectangle timer;
 
@@ -72,24 +82,52 @@ public class ChallengeScene extends BaseScene {
         var challengePane = new StackPane();
         challengePane.setMaxWidth(gameWindow.getWidth());
         challengePane.setMaxHeight(gameWindow.getHeight());
-        challengePane.getStyleClass().add("menu-background");
+        challengePane.getStyleClass().add("challenge-background");
         root.getChildren().add(challengePane);
 
-        var score = new Text("Score: " + game.scoreProperty().asString().getValue());
-        var level = new Text("Level: " + game.levelProperty().asString().getValue());
-        var multiplier = new Text("Multiplier: " + game.multiplierProperty().asString().getValue());
-        var lives = new Text("Lives: " + game.livesProperty().asString().getValue());
-
+        var score = new Text("Score: ");
+        var scoreValue = new Text("0");
+        scoreValue.textProperty().bind(game.scoreProperty().asString());
+        var scoreBox = new HBox(score, scoreValue);
         score.getStyleClass().add("heading");
+        scoreValue.getStyleClass().add("heading");
+        var level = new Text("Level: ");
+        var levelValue = new Text("1");
+        levelValue.textProperty().bind(game.levelProperty().asString());
+        var levelBox = new HBox(level, levelValue);
         level.getStyleClass().add("heading");
+        levelValue.getStyleClass().add("heading");
+        var multiplier = new Text("Multiplier: ");
+        var multiplierValue = new Text("1");
+        multiplierValue.textProperty().bind(game.multiplierProperty().asString());
+        var multiplierBox = new HBox(multiplier, multiplierValue);
         multiplier.getStyleClass().add("heading");
+        multiplierValue.getStyleClass().add("heading");
+        var lives = new Text("Lives: ");
+        var livesValue = new Text("3");
+        livesValue.textProperty().bind(game.livesProperty().asString());
+        var livesBox = new HBox(lives, livesValue);
         lives.getStyleClass().add("heading");
+        livesValue.getStyleClass().add("heading");
 
         HBox statistics = new HBox(20, score, level, multiplier, lives);
 
         challengePane.getChildren().add(statistics);
         statistics.setAlignment(Pos.TOP_CENTER);
         statistics.setTranslateY(20);
+
+        var highScore = new Text("Highscore: ");
+        var highScoreText = new Text();
+        highScoreText.textProperty().bind(highScoreValue.asString());
+        var highScoreBox = new VBox(highScore, highScoreText);
+        highScore.getStyleClass().add("heading");
+        highScoreText.getStyleClass().add("heading");
+
+        challengePane.getChildren().add(highScoreBox);
+        highScoreBox.setAlignment(Pos.TOP_CENTER);
+        highScoreBox.setTranslateY(100);
+        highScoreBox.setTranslateX(285);
+
 
         pieceBoard = new GameBoard(3,3,100,100);
         pieceBoard.setAlignment(Pos.CENTER);
@@ -127,7 +165,12 @@ public class ChallengeScene extends BaseScene {
 
         game.setLineClearedListener(this::lineClear);
 
-        game.setOnGameLoop(this::gameLoop);
+        game.setOnGameLoopListener(this::gameLoop);
+
+        game.setGameEndListener(game -> {
+            gameEnd();
+            gameWindow.startScores(game);
+        });
 
         // Setting Right Click Listener
         board.setOnRightClicked(this::rotate);
@@ -137,6 +180,8 @@ public class ChallengeScene extends BaseScene {
         followingPieceBoard.setOnBlockClick(this::swapPieces);
 
         scene.setOnKeyPressed(this::keyboardInput);
+
+        game.scoreProperty().addListener(this::getHighScore);
     }
 
     /**
@@ -177,7 +222,9 @@ public class ChallengeScene extends BaseScene {
         blockX = 0;
         blockY = 0;
         board.getBlock(blockX, blockY).paintCursor();
+        initialHighscore();
     }
+
     protected void nextPiece(GamePiece gamePiece, GamePiece followingGamePiece) {
         pieceBoard.pieceToDisplay(gamePiece);
         followingPieceBoard.pieceToDisplay(followingGamePiece);
@@ -270,6 +317,13 @@ public class ChallengeScene extends BaseScene {
         timerBar.play();
     }
 
+    protected void gameEnd() {
+        logger.info("Game Over");
+        timer.setVisible(false);
+        game.endGame();
+        multimedia.stopBackground();
+    }
+
     private Timeline createTimeLine(int delay) {
         Timeline timeline = new Timeline(new KeyFrame(Duration.ZERO, new KeyValue(timer.fillProperty(), Color.GREEN)));
         timeline.getKeyFrames().add(new KeyFrame(Duration.ZERO, new KeyValue(timer.widthProperty(), timer.getWidth())));
@@ -284,4 +338,40 @@ public class ChallengeScene extends BaseScene {
 
         return timeline;
     }
+
+
+    protected void getHighScore(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+        initialHighscore();
+    }
+
+    protected void initialHighscore() {
+        File file = new File("scores.txt");
+        int highScore = 0;
+        try {
+            if (file.exists()) {
+                ArrayList<Pair<String, Integer>> scores = new ArrayList<>();
+                BufferedReader reader = new BufferedReader(new FileReader(file));
+                Scanner scanner = new Scanner(reader);
+                while (scanner.hasNext()) {
+                    String[] nameScore = scanner.next().split(":");
+                    var entry = new Pair<String, Integer>(nameScore[0], Integer.parseInt(nameScore[1]));
+                    scores.add(entry);
+                }
+                scanner.close();
+                scores.sort((a, b) -> b.getValue() - a.getValue());
+                highScore = scores.get(0).getValue();
+            } else {
+                highScore = game.scoreProperty().get();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("Error when finding highscore");
+        }
+        if(game.scoreProperty().get() > highScore) {
+            highScoreValue.set(game.scoreProperty().get());
+        } else {
+            highScoreValue.set(highScore);
+        }
+    }
+
 }

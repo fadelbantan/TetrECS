@@ -12,6 +12,8 @@ import uk.ac.soton.comp1206.App;
 import uk.ac.soton.comp1206.network.Communicator;
 import uk.ac.soton.comp1206.scene.*;
 
+import uk.ac.soton.comp1206.game.Game;
+
 /**
  * The GameWindow is the single window for the game where everything takes place. To move between screens in the game,
  * we simply change the scene.
@@ -91,6 +93,14 @@ public class GameWindow {
     public void startInstructionsScene() {
         loadScene(new InstructionsScene(this));
     }
+
+    /**
+     * Display the scores scene
+     */
+    public void startScores(Game game) {
+        loadScene(new ScoresScene(this, game));
+    }
+
 
     /**
      * Setup the default settings for the stage itself (the window), such as the title and minimum width and height.

@@ -17,7 +17,7 @@ import uk.ac.soton.comp1206.ui.GameWindow;
 
 public class InstructionsScene extends BaseScene {
 
-    private static final Logger logger = LogManager.getLogger(MenuScene.class);
+    private static final Logger logger = LogManager.getLogger(InstructionsScene.class);
 
     private GridPane gridPane = new GridPane();
 

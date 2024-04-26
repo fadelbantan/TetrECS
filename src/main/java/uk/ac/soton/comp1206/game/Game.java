@@ -1,15 +1,19 @@
 package uk.ac.soton.comp1206.game;
 
+import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.component.GameBlockCoordinate;
+import uk.ac.soton.comp1206.event.GameEndListener;
 import uk.ac.soton.comp1206.event.GameLoopListener;
 import uk.ac.soton.comp1206.event.LineClearListener;
 import uk.ac.soton.comp1206.event.NextPieceListener;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Timer;
@@ -52,17 +56,20 @@ public class Game {
     protected NextPieceListener nextPieceListener;
     protected LineClearListener lineClearedListener;
     protected GameLoopListener gameLoopListener;
+    protected GameEndListener gameEndListener;
 
     protected ScheduledExecutorService timer;
     protected int initialDelay = 12000;
     protected ScheduledFuture<?> newLoop;
+
+    protected ArrayList<Pair<String, Integer>> scores = new ArrayList<>();
 
     /**
      *  Initial values
      */
     public IntegerProperty score = new SimpleIntegerProperty(0);
     public IntegerProperty level = new SimpleIntegerProperty(0);
-    public IntegerProperty lives = new SimpleIntegerProperty(3);
+    public IntegerProperty lives = new SimpleIntegerProperty(0);
     public IntegerProperty multiplier = new SimpleIntegerProperty(1);
 
     /**
@@ -263,8 +270,12 @@ public class Game {
         this.lineClearedListener = lineClearedListener;
     }
 
-    public void setOnGameLoop(GameLoopListener gameLoopListener) {
+    public void setOnGameLoopListener(GameLoopListener gameLoopListener) {
         this.gameLoopListener = gameLoopListener;
+    }
+
+    public void setGameEndListener(GameEndListener gameEndListener) {
+        this.gameEndListener = gameEndListener;
     }
 
     public void rotateCurrentPiece() {
@@ -288,6 +299,10 @@ public class Game {
         return followingPiece;
     }
 
+    public ArrayList<Pair<String, Integer>> getScores() {
+        return scores;
+    }
+
     public int getTimerDelay() {
         int delay = initialDelay - (500 * level.get());
         return Math.max(delay, 2500);
@@ -295,12 +310,12 @@ public class Game {
 
     public void gameLoop() {
         nextPiece();
-        if(lives.get() == 1) {
-            lives.set(0);
-            endGame();
+        if(lives.get() == 0) {
+            gameOver();
+        } else {
+            lives.set(lives.get() - 1);
+            multiplier.set(1);
         }
-        lives.set(lives.get() - 1);
-        multiplier.set(1);
         if(gameLoopListener != null) {
             gameLoopListener.gameLoop(getTimerDelay());
         }
@@ -319,10 +334,15 @@ public class Game {
     }
 
     public void endGame() {
-        timer.shutdownNow();
         logger.info("Game has ended");
+        timer.shutdownNow();
     }
 
+    public void gameOver() {
+        if (gameEndListener != null) {
+            Platform.runLater(() -> gameEndListener.gameEnd(this));
+        }
+    }
     /**
      * Skip current piece with 100 points
      */
