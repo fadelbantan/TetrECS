@@ -16,6 +16,11 @@
     -fx-background-size: cover;
 }
 
+.lobby-background {
+    -fx-background-image: url("../images/4.jpg");
+    -fx-background-size: cover;
+}
+
 .menu {
     -fx-padding: 10;
 }
@@ -26,6 +31,15 @@
     -fx-font-size: 32px;
     -fx-font-weight: 700;
     -fx-border-color: black;
+    -fx-stroke: black;
+    -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+}
+
+.smallMenuItem {
+    -fx-fill: white;
+    -fx-font-family: 'Orbitron';
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
     -fx-stroke: black;
     -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
 }
@@ -183,7 +197,8 @@
 }
 
 .messages Text {
-    -fx-fill: white;
+    -fx-fill: black;
+    -fx-font-family: 'Orbitron';
 }
 
 TextField {

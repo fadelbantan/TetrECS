@@ -69,7 +69,7 @@ public class Game {
      */
     public IntegerProperty score = new SimpleIntegerProperty(0);
     public IntegerProperty level = new SimpleIntegerProperty(0);
-    public IntegerProperty lives = new SimpleIntegerProperty(0);
+    public IntegerProperty lives = new SimpleIntegerProperty(3);
     public IntegerProperty multiplier = new SimpleIntegerProperty(1);
 
     /**

@@ -90,7 +90,7 @@ public class GameWindow {
     /**
      * Display the instructions scene
      */
-    public void startInstructionsScene() {
+    public void startInstructions() {
         loadScene(new InstructionsScene(this));
     }
 
@@ -101,6 +101,9 @@ public class GameWindow {
         loadScene(new ScoresScene(this, game));
     }
 
+    public void startLobby() {
+        loadScene(new LobbyScene(this));
+    }
 
     /**
      * Setup the default settings for the stage itself (the window), such as the title and minimum width and height.
