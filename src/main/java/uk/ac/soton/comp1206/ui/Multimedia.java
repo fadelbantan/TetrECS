@@ -10,8 +10,8 @@ import java.util.Objects;
 
 public class Multimedia {
     private static final Logger logger = LogManager.getLogger(Multimedia.class);
-    public static MediaPlayer backgroundPlayer;
-    public static MediaPlayer audioPlayer;
+    private static MediaPlayer backgroundPlayer;
+    private static MediaPlayer audioPlayer;
 
     /**
      * Play background music

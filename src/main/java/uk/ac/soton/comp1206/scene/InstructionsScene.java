@@ -14,12 +14,14 @@ import uk.ac.soton.comp1206.component.GameBoard;
 import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
+import uk.ac.soton.comp1206.ui.Multimedia;
 
 public class InstructionsScene extends BaseScene {
 
     private static final Logger logger = LogManager.getLogger(InstructionsScene.class);
 
-    private GridPane gridPane = new GridPane();
+    protected Multimedia multimedia = new Multimedia();
+
 
     /**
      * Create a new scene, passing in the GameWindow the scene will be displayed in
@@ -35,6 +37,7 @@ public class InstructionsScene extends BaseScene {
         //Escape Key Event
         scene.setOnKeyPressed(keyEvent -> {
             if(keyEvent.getCode() == KeyCode.ESCAPE) {
+                multimedia.playAudio("transition.wav");
                 gameWindow.startMenu();
                 logger.info("Escape Pressed");
             }

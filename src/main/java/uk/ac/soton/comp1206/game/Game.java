@@ -12,11 +12,11 @@ import uk.ac.soton.comp1206.event.GameEndListener;
 import uk.ac.soton.comp1206.event.GameLoopListener;
 import uk.ac.soton.comp1206.event.LineClearListener;
 import uk.ac.soton.comp1206.event.NextPieceListener;
+import uk.ac.soton.comp1206.ui.Multimedia;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
-import java.util.Timer;
 import java.util.concurrent.*;
 
 
@@ -53,24 +53,28 @@ public class Game {
     protected GamePiece followingPiece;
 
 
+    // TODO Listeners used for game logic
     protected NextPieceListener nextPieceListener;
     protected LineClearListener lineClearedListener;
     protected GameLoopListener gameLoopListener;
     protected GameEndListener gameEndListener;
 
+    // TODO Timer - detects when a turn should end
     protected ScheduledExecutorService timer;
     protected int initialDelay = 12000;
     protected ScheduledFuture<?> newLoop;
 
+    // TODO ArrayList of local scores available
     protected ArrayList<Pair<String, Integer>> scores = new ArrayList<>();
+    protected Multimedia multimedia = new Multimedia();
 
     /**
      *  Initial values
      */
-    public IntegerProperty score = new SimpleIntegerProperty(0);
-    public IntegerProperty level = new SimpleIntegerProperty(0);
-    public IntegerProperty lives = new SimpleIntegerProperty(3);
-    public IntegerProperty multiplier = new SimpleIntegerProperty(1);
+    protected IntegerProperty score = new SimpleIntegerProperty(0);
+    protected IntegerProperty level = new SimpleIntegerProperty(0);
+    protected IntegerProperty lives = new SimpleIntegerProperty(3);
+    protected IntegerProperty multiplier = new SimpleIntegerProperty(1);
 
     /**
      * Create a new game with the specified rows and columns. Creates a corresponding grid model.
@@ -160,7 +164,7 @@ public class Game {
         int linesCleared = 0;
         HashSet<GameBlockCoordinate> clearBlocks = new HashSet<>();
 
-        // Clearing horizontal lines
+        // Clearing vertical lines
         for (int x = 0; x < cols; x++) {
             int counter = 0;
             for (int y = 0; y < rows; y++) {
@@ -171,12 +175,13 @@ public class Game {
                 linesCleared++;
                 for (int y = 0; y < rows; y++) {
                     GameBlockCoordinate coordinate = new GameBlockCoordinate(x, y);
+                    // TODO Add all GameBlockCoordinates to HashSet to be cleared
                     clearBlocks.add(coordinate);
                 }
             }
         }
 
-        // Clearing vertical lines
+        // Clearing horizontal lines
         for (int y = 0; y < rows; y++) {
             int  counter = 0;
             for (int x = 0; x < cols; x++) {
@@ -187,25 +192,32 @@ public class Game {
                 linesCleared++;
                 for (int x = 0; x < cols; x++) {
                     GameBlockCoordinate coordinate = new GameBlockCoordinate(x, y);
+                    // TODO Add all GameBlockCoordinates to HashSet to be cleared
                     clearBlocks.add(coordinate);
                 }
             }
         }
-        if(linesCleared>0) {
-            clear(clearBlocks);
-            score(linesCleared, clearBlocks.size());
+        // TODO if there's a line to clear
+        if(linesCleared > 0) {
+            // TODO clears the block
+            clear (clearBlocks);
+            // TODO increments the score
+            score (linesCleared, clearBlocks.size());
+            // TODO increment multiplier score
             this.multiplier.set(this.multiplier.add(1).get());
             if(lineClearedListener != null) {
+                // TODO calls listener
                 lineClearedListener.lineClear(clearBlocks);
-                logger.info("Clear Lines");
+                logger.info("Clear Line/s");
             }
         } else {
+            // TODO resets multiplier
             this.multiplier.set(1);
         }
     }
 
     /**
-     * Calculate the score
+     * Calculate and add the score based on the lines and blocks cleared
      * @param lines number of lines cleared
      * @param blocks number of grid blocks cleared
      */
@@ -216,6 +228,7 @@ public class Game {
         int level = this.score.get() / 1000;
         if (this.level.get() != level) {
             this.level.set(level);
+            multimedia.playMusic("level.wav");
         }
     }
 
@@ -245,12 +258,12 @@ public class Game {
 
     /**
      * Randomise generating the pieces
-     * @return GamePiece
+     * @return new GamePiece
      */
     public GamePiece spawnPiece() {
         Random random = new Random();
-        GamePiece piece = GamePiece.createPiece(random.nextInt(PIECES));
-        return piece;
+        int randomNum = random.nextInt(15);
+        return GamePiece.createPiece(randomNum);
     }
 
     /**
@@ -299,9 +312,6 @@ public class Game {
         return followingPiece;
     }
 
-    public ArrayList<Pair<String, Integer>> getScores() {
-        return scores;
-    }
 
     public int getTimerDelay() {
         int delay = initialDelay - (500 * level.get());
@@ -314,6 +324,7 @@ public class Game {
             gameOver();
         } else {
             lives.set(lives.get() - 1);
+            multimedia.playAudio("lifelose.wav");
             multiplier.set(1);
         }
         if(gameLoopListener != null) {

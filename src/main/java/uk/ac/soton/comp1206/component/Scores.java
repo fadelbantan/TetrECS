@@ -15,11 +15,11 @@ import java.util.ArrayList;
 
 public class Scores extends VBox {
     protected SimpleListProperty<Pair<String, Integer>> localScores = new SimpleListProperty<>();
+    protected ArrayList<String> multiplayerPlayers = new ArrayList<>();
 
     public Scores() {
-        ObservableList<Pair<String, Integer>> observableList = FXCollections.observableArrayList(new ArrayList<Pair<String, Integer>>());
         this.localScores.addListener(this::updateScores);
-        localScores.set(observableList);
+        localScores.set(FXCollections.observableArrayList(new ArrayList<Pair<String, Integer>>()));
     }
 
     protected void updateScores(ObservableValue<?  extends ObservableList<Pair<String, Integer>>> observableValue, ObservableList<Pair<String, Integer>> oldVal, ObservableList<Pair<String, Integer>> newVal) {
@@ -32,10 +32,16 @@ public class Scores extends VBox {
         int x = 1;
         for(Pair pair: scores) {
             Text scoreItem = new Text(pair.getKey() + " - " + pair.getValue());
-            scoreItem.getStyleClass().add("scorelist");
+            if (multiplayerPlayers.contains(pair.getKey())) {
+                scoreItem.getStyleClass().add("scoresStrike");
+            } else {
+                scoreItem.getStyleClass().add("scores");
+            }
+
             this.getChildren().add(scoreItem);
             this.reveal(scoreItem);
             x++;
+            // Only shows the top 10 scores
             if(x==11){
                 break;
             }
@@ -55,4 +61,15 @@ public class Scores extends VBox {
         return this.localScores;
     }
 
+    public void strikeThrough(String item) {
+        int x = 0;
+        this.multiplayerPlayers.add(item);
+        for (Pair pair: localScores) {
+            if (pair.getKey().equals(item)) {
+                this.getChildren().get(x).getStyleClass().add("scoreStrike");
+            } else {
+                x++;
+            }
+        }
+    }
 }

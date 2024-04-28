@@ -86,7 +86,7 @@ public class MenuScene extends BaseScene {
         multiPlayer.setOnAction(this::startMultiplayer);
         instructions.setOnAction(this::startInstructions);
         exit.setOnAction((ActionEvent event) -> {
-            Platform.exit();
+            System.exit(0);
         });
         //Editing what happens when hover
         for (Node node: vbox.getChildren()) {
@@ -120,16 +120,20 @@ public class MenuScene extends BaseScene {
      */
     private void startGame(ActionEvent event) {
         gameWindow.startChallenge();
+        multimedia.playAudio("transition.wav");
         this.multimedia.stopBackground();
     }
 
     private void startMultiplayer(ActionEvent event) {
         gameWindow.startLobby();
+        multimedia.playAudio("transition.wav");
+        multimedia.stopBackground();
     }
 
     private void startInstructions(ActionEvent event) {
 
         gameWindow.startInstructions();
+        multimedia.playAudio("transition.wav");
         multimedia.stopBackground();
     }
 }

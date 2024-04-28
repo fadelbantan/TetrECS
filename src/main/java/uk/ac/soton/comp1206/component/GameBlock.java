@@ -1,9 +1,9 @@
 package uk.ac.soton.comp1206.component;
 
-import javafx.animation.Animation;
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.*;
@@ -95,6 +95,15 @@ public class GameBlock extends Canvas {
 
         //When the value property is updated, call the internal updateValue method
         value.addListener(this::updateValue);
+
+        // TODO Added this last check
+        this.hoverProperty().addListener((ChangeListener<Boolean>) (observable, oldValue, newValue) -> {
+            if (newValue) {
+                paintCursor();
+            } else {
+                paint();
+            }
+        });
     }
 
     /**

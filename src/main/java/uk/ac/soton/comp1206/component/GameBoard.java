@@ -16,7 +16,7 @@ import java.util.Set;
  * A GameBoard is a visual component to represent the visual GameBoard.
  * It extends a GridPane to hold a grid of GameBlocks.
  *
- * The GameBoard can hold an internal grid of its own, for example, for displaying an upcoming block. It also be
+ * The GameBoard can hold an internal grid of its own, for example, for displaying an upcoming block. It will also be
  * linked to an external grid, for the main game board.
  *
  * The GameBoard is only a visual representation and should not contain game logic or model logic in it, which should
@@ -210,5 +210,8 @@ public class GameBoard extends GridPane {
         }
     }
 
+    public Grid getGrid() {
+        return grid;
+    }
 
 }

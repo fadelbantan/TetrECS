@@ -17,6 +17,7 @@ import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlockCoordinate;
+import uk.ac.soton.comp1206.game.MultiplayerGame;
 import uk.ac.soton.comp1206.ui.Multimedia;
 import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.component.GameBoard;
@@ -48,13 +49,15 @@ public class ChallengeScene extends BaseScene {
 
     protected GameBoard board;
 
-    protected int blockX;
+    protected int blockX = 0;
 
-    protected int blockY;
+    protected int blockY = 0;
 
     public SimpleIntegerProperty highScoreValue = new SimpleIntegerProperty(0);
 
     protected Rectangle timer;
+
+    protected BorderPane mainPane;
 
 
     /**
@@ -85,24 +88,31 @@ public class ChallengeScene extends BaseScene {
         challengePane.getStyleClass().add("challenge-background");
         root.getChildren().add(challengePane);
 
+        // TODO Score UI element
         var score = new Text("Score: ");
         var scoreValue = new Text("0");
         scoreValue.textProperty().bind(game.scoreProperty().asString());
         var scoreBox = new HBox(score, scoreValue);
         score.getStyleClass().add("heading");
         scoreValue.getStyleClass().add("heading");
+
+        // TODO  Level UI element
         var level = new Text("Level: ");
         var levelValue = new Text("1");
         levelValue.textProperty().bind(game.levelProperty().asString());
         var levelBox = new HBox(level, levelValue);
         level.getStyleClass().add("heading");
         levelValue.getStyleClass().add("heading");
+
+        // TODO Multiplier UI element
         var multiplier = new Text("Multiplier: ");
         var multiplierValue = new Text("1");
         multiplierValue.textProperty().bind(game.multiplierProperty().asString());
         var multiplierBox = new HBox(multiplier, multiplierValue);
         multiplier.getStyleClass().add("heading");
         multiplierValue.getStyleClass().add("heading");
+
+        // TODO Lives UI element
         var lives = new Text("Lives: ");
         var livesValue = new Text("3");
         livesValue.textProperty().bind(game.livesProperty().asString());
@@ -110,44 +120,43 @@ public class ChallengeScene extends BaseScene {
         lives.getStyleClass().add("heading");
         livesValue.getStyleClass().add("heading");
 
+        // TODO HBox that includes all of the key stats for the game
         HBox statistics = new HBox(20, score, level, multiplier, lives);
-
         challengePane.getChildren().add(statistics);
         statistics.setAlignment(Pos.TOP_CENTER);
         statistics.setTranslateY(20);
 
-        var highScore = new Text("Highscore: ");
+        // TODO High score UI element
+        var highScore = new Text("High score: ");
         var highScoreText = new Text();
         highScoreText.textProperty().bind(highScoreValue.asString());
         var highScoreBox = new VBox(highScore, highScoreText);
         highScore.getStyleClass().add("heading");
         highScoreText.getStyleClass().add("heading");
 
-        challengePane.getChildren().add(highScoreBox);
         highScoreBox.setAlignment(Pos.TOP_CENTER);
-        highScoreBox.setTranslateY(100);
-        highScoreBox.setTranslateX(285);
+        highScoreBox.setTranslateY(-30);
+        highScoreBox.setTranslateX(22.5);
 
 
         pieceBoard = new GameBoard(3,3,100,100);
         pieceBoard.setAlignment(Pos.CENTER);
 
         followingPieceBoard = new GameBoard(3,3,75,75);
-
         followingPieceBoard.setAlignment(Pos.CENTER);
         pieceBoard.setTranslateY(-10);
         pieceBoard.setTranslateX(12.5);
+        pieceBoard.paintCenter();
 
-        var pieces = new VBox(pieceBoard, followingPieceBoard);
+        var pieces = new VBox(highScoreBox, pieceBoard, followingPieceBoard);
         pieces.setAlignment(Pos.CENTER_RIGHT);
         pieces.setTranslateX(-75);
 
         timer = new Rectangle(gameWindow.getWidth(),10);
-
         var timePane = new StackPane();
         timePane.getChildren().add(timer);
 
-        var mainPane = new BorderPane();
+        mainPane = new BorderPane();
         challengePane.getChildren().add(mainPane);
 
         mainPane.setRight(pieces);
@@ -179,7 +188,6 @@ public class ChallengeScene extends BaseScene {
 
         followingPieceBoard.setOnBlockClick(this::swapPieces);
 
-        scene.setOnKeyPressed(this::keyboardInput);
 
         game.scoreProperty().addListener(this::getHighScore);
     }
@@ -215,13 +223,9 @@ public class ChallengeScene extends BaseScene {
     public void initialise() {
         logger.info("Initialising Challenge");
         game.start();
-        multimedia.playMusic("game.wav");
-
+        this.multimedia.playMusic("game.wav");
 
         scene.setOnKeyPressed(this::keyboardInput);
-        blockX = 0;
-        blockY = 0;
-        board.getBlock(blockX, blockY).paintCursor();
         initialHighscore();
     }
 
@@ -239,7 +243,7 @@ public class ChallengeScene extends BaseScene {
     }
 
     protected void rotate(int rotations) {
-        for(int x = 0; x< rotations; x++) {
+        for(int x = 0; x < rotations; x++) {
             game.rotateCurrentPiece();
         }
         pieceBoard.pieceToDisplay(game.getCurrentPiece());
@@ -256,14 +260,20 @@ public class ChallengeScene extends BaseScene {
         followingPieceBoard.pieceToDisplay(game.getFollowingPiece());
         multimedia.playAudio("rotate.wav");
     }
+
+
     protected void keyboardInput(KeyEvent keyEvent) {
         int oldBlockX = blockX;
         int oldBlockY = blockY;
         boolean moved = false;
 
         if(keyEvent.getCode() == KeyCode.ESCAPE) {
-            multimedia.stopBackground();
-            gameWindow.startMenu();
+            gameEnd();
+
+            if (!(game instanceof MultiplayerGame)) {
+                gameWindow.startMenu();
+            }
+
             logger.info("Escape Pressed");
         } else if(keyEvent.getCode() == KeyCode.Q || keyEvent.getCode() == KeyCode.Z || keyEvent.getCode() == KeyCode.OPEN_BRACKET) {
             rotateLeft();
@@ -318,10 +328,13 @@ public class ChallengeScene extends BaseScene {
     }
 
     protected void gameEnd() {
-        logger.info("Game Over");
-        timer.setVisible(false);
-        game.endGame();
-        multimedia.stopBackground();
+        if(!(game instanceof MultiplayerGame)) { //Ends game only if the game is a challenge scene game
+            logger.info("Game Over");
+            timer.setVisible(false);
+            game.endGame();
+            multimedia.stopBackground();
+            multimedia.playAudio("transition.wav");
+        }
     }
 
     private Timeline createTimeLine(int delay) {
@@ -365,13 +378,12 @@ public class ChallengeScene extends BaseScene {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("Error when finding highscore");
+            logger.error("Error when finding high score");
         }
-        if(game.scoreProperty().get() > highScore) {
+        if (game.scoreProperty().get() > highScore) {
             highScoreValue.set(game.scoreProperty().get());
         } else {
             highScoreValue.set(highScore);
         }
     }
-
 }

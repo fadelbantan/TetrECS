@@ -46,8 +46,10 @@ public class ScoresScene extends BaseScene {
 
     protected SimpleListProperty<Pair<String, Integer>> remoteScoresList = new SimpleListProperty<>();
 
+    protected SimpleListProperty<Pair<String, Integer>> multiplayerScores;
     protected Communicator communicator;
-    protected CommunicationsListener communicationsListener;
+
+    protected boolean isMultiplayer = false;
 
     /**
      * Create a new scene, passing in the GameWindow the scene will be displayed in
@@ -64,16 +66,46 @@ public class ScoresScene extends BaseScene {
 
     }
 
+
+    /**
+     * TODO HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+     * Create a new scene, passing in the GameWindow the scene will be displayed in, and passing in multiplayer scores
+     * which will displayed as a scorelist
+     * @param gameWindow the game window
+     */
+    public ScoresScene(GameWindow gameWindow, Game game, SimpleListProperty<Pair<String, Integer>> scores) {
+        super(gameWindow);
+        gameState = game;
+        score = game.scoreProperty().get(); //sets the score that the player achieved
+        //Sets the localscorelist to the scores in multiplayer
+        this.localScoreList.set(FXCollections.observableArrayList(new ArrayList<Pair<String, Integer>>()));
+        this.remoteScoresList.set(FXCollections.observableArrayList(new ArrayList<Pair<String, Integer>>()));
+        multiplayerScores = scores;
+        logger.info("Creating Scores Scene");
+        communicator = gameWindow.getCommunicator();
+        isMultiplayer = true;
+    }
+
     @Override
     public void initialise() {
         multimedia.playAudio("explode.wav");
         multimedia.playMusic("end.wav");
-        loadScores();
-        addScore(this.name, this.score);
+
+        if(!isMultiplayer) {
+            loadScores();
+            addScore(this.name, this.score);
+        } else {
+            this.localScoreList.addAll(multiplayerScores);
+            this.localScoreList.sort((a, b) -> b.getValue() - a.getValue());
+        }
         this.scene.setOnKeyPressed(keyEvent -> {
             if(keyEvent.getCode() == KeyCode.ESCAPE) {
+                multimedia.playAudio("transition.wav");
                 gameWindow.startMenu();
                 logger.info("Escape Pressed");
+                if (isMultiplayer) {
+                    communicator.send("PART");
+                }
             }
         });
         loadOnlineScores();
@@ -135,11 +167,13 @@ public class ScoresScene extends BaseScene {
         onlineScoresList.setTranslateX(-300);
         this.remoteScoresList.bind(onlineScoresList.listProperty());
 
-        var nameDialog = new TextInputDialog();
-        nameDialog.setTitle("Score Input");
-        nameDialog.setContentText("Enter Name To Add to Leaderboard");
-        Optional<String> result = nameDialog.showAndWait();
-        this.name = result.orElse("Anon");
+        if(!isMultiplayer) {
+            var nameDialog = new TextInputDialog();
+            nameDialog.setTitle("Score Input");
+            nameDialog.setContentText("Enter Name To Add to Leaderboard");
+            Optional<String> result = nameDialog.showAndWait();
+            this.name = result.orElse("Anon");
+        }
 
         var exit = new Button("Exit To Main Menu");
         exit.setBackground(null);
@@ -187,12 +221,12 @@ public class ScoresScene extends BaseScene {
         try {
             file.createNewFile();
 
-            scores.add(new Pair<>("Daveraj", 500));
-            scores.add(new Pair<>("Daveraj", 400));
-            scores.add(new Pair<>("Daveraj", 300));
-            scores.add(new Pair<>("Daveraj", 200));
-            scores.add(new Pair<>("Daveraj", 100));
-            scores.add(new Pair<>("Daveraj", 50));
+            scores.add(new Pair<>("Fadel", 1000));
+            scores.add(new Pair<>("Fadel", 900));
+            scores.add(new Pair<>("Fadel", 750));
+            scores.add(new Pair<>("Fadel", 700));
+            scores.add(new Pair<>("Fadel", 600));
+            scores.add(new Pair<>("Fadel", 500));
 
             FileWriter fileWriter = new FileWriter(file);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
@@ -243,7 +277,7 @@ public class ScoresScene extends BaseScene {
     protected void receiveCommunication(String message) {
         if(message.contains("NEWSCORE")) {
             logger.info("Server received highscore");
-        } else {
+        } else if (message.contains("HISCORE")) {
             message = message.replace("HISCORES", "");
             String[] pairs = message.split("\n");
             for (String pair : pairs) {
@@ -259,5 +293,9 @@ public class ScoresScene extends BaseScene {
     protected void startMenu(ActionEvent event) {
         gameWindow.startMenu();
         multimedia.stopBackground();
+        multimedia.playAudio("transition.wav");
+        if (isMultiplayer) {
+            communicator.send("PART");
+        }
     }
 }
