@@ -9,12 +9,26 @@ import uk.ac.soton.comp1206.ui.GameWindow;
 import java.util.LinkedList;
 import java.util.concurrent.Executors;
 
-public class MultiplayerGame extends Game {
+/**
+ * The MultiplayerGame extends the Game class, and implements communicator to allow for multiplayer to function.
+ */
+public class MultiplayerGame extends Game{
 
     private static final Logger logger = LogManager.getLogger(MultiplayerGame.class);
 
+    /**
+     * Communicator used to receive and send messages to the server
+     */
     protected Communicator communicator;
+
+    /**
+     * GameWindow of the current game
+     */
     protected GameWindow gameWindow;
+
+    /**
+     * Queue of pieces to be played
+     */
     protected LinkedList<GamePiece> queue = new LinkedList<>();
 
     /**
@@ -22,23 +36,25 @@ public class MultiplayerGame extends Game {
      *
      * @param cols number of columns
      * @param rows number of rows
+     * @param gameWindow the current GameWindow
      */
     public MultiplayerGame(int cols, int rows, GameWindow gameWindow) {
         super(cols, rows);
         this.gameWindow = gameWindow;
     }
 
+    /**
+     * Handles what should happen when a new piece is received from the server
+     * @param gamePiece
+     */
     public void newPiece(GamePiece gamePiece) {
         if(currentPiece == null) {
-            // TODO First Piece
-            currentPiece = gamePiece;
+            currentPiece = gamePiece; //First Piece
         } else if(followingPiece == null){
-            // TODO Second piece
-            followingPiece = gamePiece;
+            followingPiece = gamePiece; //Second Piece
             nextPieceListener.nextPiece(currentPiece, followingPiece);
         } else {
-            // TODO Adds a queue
-            queue.add(gamePiece);
+            queue.add(gamePiece);//Creates Queue
         }
     }
 
@@ -60,13 +76,13 @@ public class MultiplayerGame extends Game {
     @Override
     public void afterPiece() {
         super.afterPiece();
-        StringBuilder board = new StringBuilder("BOARD ");
+        String board = "BOARD ";
         for (int x = 0; x < this.getCols(); x++) {
             for(int y = 0; y < this.getRows(); y++) {
-                board.append(grid.get(x, y)).append(" ");
+                board = board + grid.get(x,y) + " ";
             }
         }
-        communicator.send(board.toString());
+        communicator.send(board);
     }
 
     /**
@@ -86,8 +102,8 @@ public class MultiplayerGame extends Game {
     /**
      * Increases the Score depending on the number of lines and blocks cleared. Also increments Level every 1000 points.
      * Sends score to the server.
-     * @param lines
-     * @param blocks
+     * @param lines number of lines cleared
+     * @param blocks number of blocks cleared
      */
     @Override
     public void score(int lines, int blocks) {
@@ -97,10 +113,10 @@ public class MultiplayerGame extends Game {
 
     /**
      * Handles messages from communicator
-     * @param message
+     * @param message message received from communicator
      */
     protected void listen(String message) {
-        if (message.contains("PIECE")) {
+        if(message.contains("PIECE")) {
             logger.info("Adding piece to queue");
             message = message.replace("PIECE ", "");
             GamePiece gamePiece = GamePiece.createPiece(Integer.parseInt(message));

@@ -12,7 +12,7 @@ import javafx.beans.property.SimpleIntegerProperty;
  *
  * The Grid contains functions related to modifying the model, for example, placing a piece inside the grid.
  *
- * The Grid should be linked to a GameBoard for its display.
+ * The Grid should be linked to a GameBoard for it's display.
  */
 public class Grid {
 
@@ -104,27 +104,23 @@ public class Grid {
     }
 
     /**
-     *  Returns true or false if a GamePiece can be played or not
-     * @param piece GamePiece
-     * @param placeX x
-     * @param placeY y
-     * @return false if piece cannot be played
+     * Returns whether a piece can be played in a given position
+     * @param gamePiece A given GamePiece
+     * @param placeX X Coordinate
+     * @param placeY Y Coordinate
+     * @return Whether a piece cna be played (True/False)
      */
-    public boolean canPlayPiece(GamePiece piece, int placeX, int placeY) {
+    public Boolean canPlayPiece(GamePiece gamePiece, int placeX, int placeY) {
         placeX -= 1;
         placeY -= 1;
-        int[][] blocks = piece.getBlocks();
+        int[][] gamePieceBlocks = gamePiece.getBlocks();
 
-        // Iterate over each component of the game piece
-        for (int x = 0; x < blocks.length; x++) {
-            for (int y = 0; y < blocks[x].length; y++) {
-
-                int value = blocks[x][y];
-                // If there's no block, ignore it
+        for (int x = 0; x < gamePieceBlocks.length; x++) {
+            for (int y = 0; y < gamePieceBlocks[x].length; y++) {
+                int value = gamePieceBlocks[x][y];
                 if (value == 0) continue;
-
-                int gridValue = get(x + placeX, y + placeY);
-                if (gridValue != 0) {
+                int grid = get(x + placeX, y + placeY);
+                if(grid != 0) {
                     return false;
                 }
             }
@@ -133,36 +129,35 @@ public class Grid {
     }
 
     /**
-     *
-     Given the x and y of the grid, a GamePiece is positioned within the grid
-     * @param piece GamePiece
-     * @param placeX x
-     * @param placeY y
-     * @return true when a piece is played
+     * Plays a given GamePiece by its centre in a given position
+     * @param gamePiece A given GamePiece
+     * @param placeX X Coordinate
+     * @param placeY Y Coordinate
      */
-    public void playPiece(GamePiece piece, int placeX, int placeY) {
-        placeX -= 1;
-        placeY -= 1;
-        int[][] blocks = piece.getBlocks();
-        // Iterate over each component of the game piece
-        for (int x = 0; x < blocks.length; x++) {
-            for (int y = 0; y < blocks[x].length; y++) {
+    public void playPiece(GamePiece gamePiece, int placeX, int placeY) {
+        placeX -=1;
+        placeY -=1;
+        int[][] gamePieceBlocks = gamePiece.getBlocks();
 
-                int value = blocks[x][y];
-                // If there's no block, ignore it
-                if (value == 0) continue;
-                set(x + placeX, y + placeY, value);
+        for(int x = 0; x < gamePieceBlocks.length; x++) {
+            for(int y = 0; y < gamePieceBlocks[x].length; y++) {
+                int value = gamePieceBlocks[x][y];
+                if(value == 0) continue;
+
+                set(x+placeX, y + placeY, value);
             }
         }
     }
 
     /**
-     * Remove all blocks on grid
+     * Clears the whole Grid
      */
-    public void cleanGrid() {
-        for (int x = 0; x < this.cols; x++) {
-            for (int y = 0; y < this.rows; y++)
-                this.grid[x][y].set(0);
+    public void clearGrid() {
+        for(int x = 0; x < cols; x++) {
+            for(int y = 0; y < rows; y++) {
+                grid[x][y].set(0);
+            }
         }
     }
+
 }

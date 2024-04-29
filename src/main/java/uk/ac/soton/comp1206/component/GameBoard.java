@@ -16,7 +16,7 @@ import java.util.Set;
  * A GameBoard is a visual component to represent the visual GameBoard.
  * It extends a GridPane to hold a grid of GameBlocks.
  *
- * The GameBoard can hold an internal grid of its own, for example, for displaying an upcoming block. It will also be
+ * The GameBoard can hold an internal grid of it's own, for example, for displaying an upcoming block. It also be
  * linked to an external grid, for the main game board.
  *
  * The GameBoard is only a visual representation and should not contain game logic or model logic in it, which should
@@ -60,6 +60,7 @@ public class GameBoard extends GridPane {
      * The listener to call when a specific block is clicked
      */
     private BlockClickedListener blockClickedListener;
+
     private RightClickListener rightClickListener;
 
 
@@ -81,7 +82,7 @@ public class GameBoard extends GridPane {
     }
 
     /**
-     * Create a new GameBoard with its own internal grid, specifying the number of columns and rows, along with the
+     * Create a new GameBoard with it's own internal grid, specifying the number of columns and rows, along with the
      * visual width and height.
      *
      * @param cols number of columns for internal grid
@@ -101,7 +102,7 @@ public class GameBoard extends GridPane {
     }
 
     /**
-     * Get a specific block from the GameBoard, specified by its row and column
+     * Get a specific block from the GameBoard, specified by it's row and column
      * @param x column
      * @param y row
      * @return game block at the given column and row
@@ -159,6 +160,7 @@ public class GameBoard extends GridPane {
                 rightClicked(e, block);
             }
         });
+
         return block;
     }
 
@@ -183,10 +185,19 @@ public class GameBoard extends GridPane {
         }
     }
 
-    public void setOnRightClicked(RightClickListener rightClickedListener) {
-        this.rightClickListener = rightClickedListener;
+    /**
+     * Sets the RightClickedListener for the GameBoard
+     * @param rightClickedListener
+     */
+    public void setOnRightClick(RightClickListener rightClickedListener) {
+        this.rightClickListener = rightClickListener;
     }
 
+    /**
+     * When a Block is RightClicked, this wil trigger
+     * @param event
+     * @param block
+     */
     private void rightClicked(MouseEvent event, GameBlock block) {
         logger.info("Block Right clicked: {}", block);
 
@@ -195,23 +206,38 @@ public class GameBoard extends GridPane {
         }
     }
 
+    /**
+     * Displays a given GamePiece in the centre of a 3x3 GameBoard.
+     * Used for previewing current and following GamePieces
+     * @param gamePiece GamePiece to be displayed
+     */
     public void pieceToDisplay(GamePiece gamePiece) {
-        this.grid.cleanGrid();
+        this.grid.clearGrid();
         this.grid.playPiece(gamePiece, 1,1);
     }
 
-    public void paintCenter() {
-        this.getBlock(1, 1).center();
+    /**
+     * Sets the centre block of a 3x3 GameBoard to have an indicator painted
+     */
+    public void paintCentre() {
+        this.getBlock(1,1).center();
     }
 
+    /**
+     * Triggers the Fade Out Animation for each block from a given Set of GameBlockCoordinates
+     * @param gameBlockCoordinates Set of GameBlockCoordinates that will be animated
+     */
     public void fadeOut(Set<GameBlockCoordinate> gameBlockCoordinates) {
-        for (GameBlockCoordinate gameBlockCoordinate: gameBlockCoordinates) {
+        for (GameBlockCoordinate gameBlockCoordinate: gameBlockCoordinates){
             blocks[gameBlockCoordinate.getX()][gameBlockCoordinate.getY()].fadeOut();
         }
     }
 
+    /**
+     * Returns grid of given GameBoard
+     * @return grid
+     */
     public Grid getGrid() {
         return grid;
     }
-
 }

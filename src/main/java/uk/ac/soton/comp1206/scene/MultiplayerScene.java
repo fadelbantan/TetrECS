@@ -3,59 +3,93 @@ package uk.ac.soton.comp1206.scene;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.*;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBoard;
-import uk.ac.soton.comp1206.component.Scores;
+import uk.ac.soton.comp1206.component.ScoresList;
 import uk.ac.soton.comp1206.game.MultiplayerGame;
 import uk.ac.soton.comp1206.network.Communicator;
-import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-public class MultiplayerScene extends ChallengeScene {
+/**
+ * The MultiplayerScene. Holds the UI for the Multiplayer mode in the game.
+ */
+public class MultiplayerScene extends ChallengeScene{
     private static final Logger logger = LogManager.getLogger(MultiplayerScene.class);
 
+    /**
+     * Shows the chat to the user
+     */
     protected VBox messagesBox;
 
+    /**
+     * Communicator used to send messages to the server, and receive messages from the server
+     */
     protected Communicator communicator;
 
+    /**
+     * TextField used as a chat input
+     */
     protected TextField textField = new TextField();
 
+
+    /**
+     * Holds all scores of all players in the game
+     */
     protected SimpleListProperty<Pair<String, Integer>> multiplayerScores = new SimpleListProperty<>();
 
-    protected Scores leaderboard;
+    /**
+     * Shows the scores of players in the game
+     */
+    protected ScoresList leaderboard;
 
+    /**
+     * Extension - Holds previews of GameBoards of all players in the game
+     */
     protected VBox boardSideBar = new VBox();
 
+    /**
+     * A Set of all players in the game
+     */
     protected Set<String> players;
 
-    protected HashMap<String, GameBoard> playerToGameBoard;
+    /**
+     * A HashMap of players to their respective GameBoard
+     */
+    protected HashMap<String, GameBoard> playerToGameboard;
 
-
+    /**
+     * Create a new MultiPlayer challenge scene
+     *
+     * @param gameWindow the Game Window
+     * @param playerSet Set of Players in the multiplayer game
+     */
     public MultiplayerScene(GameWindow gameWindow, Set<String> playerSet) {
         super(gameWindow);
         this.multiplayerScores.set(FXCollections.observableArrayList(new ArrayList<Pair<String, Integer>>()));
         this.players = playerSet;
     }
 
+    /**
+     * Initialise the scene and starts the multiplayer game.
+     * Asks the server for scores, and initialises the sidebar of all gameboards
+     */
     @Override
     public void initialise() {
         super.initialise();
@@ -66,12 +100,14 @@ public class MultiplayerScene extends ChallengeScene {
         initialisePlayerBoards();
     }
 
-
+    /**
+     * Handles Keyboard input
+     * @param keyEvent keyboard input
+     */
     @Override
     protected void keyboardInput(KeyEvent keyEvent) {
         super.keyboardInput(keyEvent);
-        // TODO Opens Chat
-        if (keyEvent.getCode() == KeyCode.T) {
+        if (keyEvent.getCode() == KeyCode.T) { //Opens Chat
             if (!textField.isVisible()) {
                 textField.setVisible(true);
                 String message = textField.getText();
@@ -84,15 +120,14 @@ public class MultiplayerScene extends ChallengeScene {
                 textField.clear();
             }
         }
-        // TODO Exits scene
-        if (keyEvent.getCode() == KeyCode.ESCAPE) {
+        if (keyEvent.getCode() == KeyCode.ESCAPE) { //Exits scene
             if (textField.isVisible()) {
                 textField.setVisible(false);
                 textField.clear();
             } else {
                 multimedia.stopBackground();
                 game.endGame();
-                multimedia.playAudio("transition.wav");
+                multimedia.playSound("transition.wav");
                 gameEnd();
                 gameWindow.startMenu();
                 communicator.send("DIE");
@@ -111,15 +146,24 @@ public class MultiplayerScene extends ChallengeScene {
         }
     }
 
+    /**
+     * Set up the game object and model
+     */
     @Override
     public void setupGame() {
-        logger.info("Staring a new multiplayer game");
-        game = new MultiplayerGame(5, 5, this.gameWindow);
+        logger.info("Starting a new multiplayer game");
+
+        game = new MultiplayerGame(5,  5, this.gameWindow);
     }
 
+    /**
+     * Build the Multiplayer window
+     */
     @Override
     public void build() {
+        super.build();
 
+        //Chat Window within the multiplayer window
         var messagesPane = new BorderPane();
         messagesPane.setPrefSize(gameWindow.getWidth()/8, gameWindow.getHeight()/8);
 
@@ -137,13 +181,8 @@ public class MultiplayerScene extends ChallengeScene {
         messagesBox.setPrefSize(currentMessages.getPrefWidth(), currentMessages.getPrefHeight());
         VBox.setVgrow(currentMessages, Priority.ALWAYS);
 
-        super.build();
-
         currentMessages.setContent(messagesBox);
         messagesPane.setCenter(currentMessages);
-
-        var messageEntry = new TextField();
-        var messageConfirm = new Button("Send");
 
         var chatHeading = new Text("Chat: <Press T to Chat>");
         chatHeading.setTextAlignment(TextAlignment.CENTER);
@@ -158,13 +197,12 @@ public class MultiplayerScene extends ChallengeScene {
 
         var chat = new VBox(chatBox, messagesPane);
 
-        // TODO Shows the score of players in the game
-        leaderboard = new Scores();
+        //Shows the score of players in the game
+        leaderboard = new ScoresList();
         leaderboard.setAlignment(Pos.CENTER);
         leaderboard.setTranslateY(-50);
         leaderboard.setTranslateX(25);
         this.multiplayerScores.bind(leaderboard.listProperty());
-
 
         var sideBar = new VBox(leaderboard, pieceBoard, followingPieceBoard);
 
@@ -172,23 +210,29 @@ public class MultiplayerScene extends ChallengeScene {
         sideBar.setTranslateX(-75);
 
         mainPane.setRight(sideBar);
-
         mainPane.setBottom(chat);
 
-        // TODO Setting GameEndListener
+        //Setting GameEndListener
         game.setGameEndListener(game -> {
             gameEnd();
-            gameWindow.startScores(game);
+            gameWindow.loadScene(new ScoresScene(gameWindow, game, this.multiplayerScores));
         });
-
     }
 
+    /**
+     * Changes the style of a player's name on the leaderboard when a player gets a game over or leaves
+     * @param userName name of player
+     */
     protected void endUser(String userName) {
         leaderboard.strikeThrough(userName);
     }
 
+    /**
+     * Handles messages from communicator
+     * @param s message received from communicator
+     */
     protected void listen(String s) {
-        if(s.contains("MSG")) {
+        if(s.contains("MSG")) { //chat message
             s = s.replace("MSG ", "");
             String[] messageArr = s.split(":");
             if (messageArr.length > 1) {
@@ -196,7 +240,7 @@ public class MultiplayerScene extends ChallengeScene {
                 message.getStyleClass().add("messages Text");
                 messagesBox.getChildren().add(message);
             }
-        } else if (s.contains("SCORES")) {
+        } else if (s.contains("SCORES")) { //Scores of all players in the game
             s = s.replace("SCORES ", "");
             String[] playerScoreLives = s.split("\n");
             this.multiplayerScores.clear();
@@ -209,31 +253,38 @@ public class MultiplayerScene extends ChallengeScene {
             s = s.replace("DIE ", "");
             endUser(s);
         } else if(s.contains(("BOARD"))) { //A representation of a player's GameBoard
-            s = s.replace("BOARD ", "");
+            s=s.replace("BOARD ", "");
             updatePlayerBoard(s);
         }
     }
 
+    /**
+     * Initialises the sidebar which contains previews of all player's GameBoards
+     */
     public void initialisePlayerBoards() {
-        playerToGameBoard = new HashMap<>();
-        for (String player : players) {
-            GameBoard gameBoard = new GameBoard(5, 5, 75, 75);
+        playerToGameboard = new HashMap<>();
+        for (String player: players) {
+            GameBoard gameBoard = new GameBoard(5,5, 75,75);
             Text name = new Text(player);
             name.getStyleClass().add("heading");
             name.setTextAlignment(TextAlignment.CENTER);
             boardSideBar.getChildren().addAll(name, gameBoard);
-            playerToGameBoard.put(player, gameBoard);
+            playerToGameboard.put(player, gameBoard);
         }
         mainPane.setLeft(boardSideBar);
         boardSideBar.setAlignment(Pos.CENTER_LEFT);
         boardSideBar.setMaxHeight(this.gameWindow.getHeight());
     }
 
+    /**
+     * Updates GameBoards when a message is received
+     * @param board String representation of a GameBoard
+     */
     public void updatePlayerBoard(String board) {
         String player = board.split(":")[0];
         String[] values = board.split(":")[1].split(" ");
         if(players.contains(player)) {
-            GameBoard gameBoard = playerToGameBoard.get(player);
+            GameBoard gameBoard = playerToGameboard.get(player);
             int i = 0;
             for (int x = 0; x < this.game.getCols(); x++) {
                 for (int y = 0; y < this.game.getRows(); y++) {
@@ -243,5 +294,4 @@ public class MultiplayerScene extends ChallengeScene {
             }
         }
     }
-
 }

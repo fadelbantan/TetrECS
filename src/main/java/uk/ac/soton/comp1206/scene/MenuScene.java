@@ -1,31 +1,34 @@
 package uk.ac.soton.comp1206.scene;
+
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import uk.ac.soton.comp1206.ui.Multimedia;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
-
+import uk.ac.soton.comp1206.ui.Multimedia;
 
 /**
  * The main menu of the game. Provides a gateway to the rest of the game.
  */
 public class MenuScene extends BaseScene {
+
     private static final Logger logger = LogManager.getLogger(MenuScene.class);
+
     private Multimedia multimedia = new Multimedia();
+
     /**
      * Create a new menu scene
      * @param gameWindow the Game Window this will be displayed in
@@ -34,20 +37,25 @@ public class MenuScene extends BaseScene {
         super(gameWindow);
         logger.info("Creating Menu Scene");
     }
+
     /**
      * Build the menu layout
      */
     @Override
     public void build() {
         logger.info("Building " + this.getClass().getName());
+
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
+
         var menuPane = new StackPane();
         menuPane.setMaxWidth(gameWindow.getWidth());
         menuPane.setMaxHeight(gameWindow.getHeight());
         menuPane.getStyleClass().add("menu-background");
         root.getChildren().add(menuPane);
+
         var mainPane = new BorderPane();
         menuPane.getChildren().add(mainPane);
+
         //Better title
         Image titleImage = new Image(MenuScene.class.getResource("/images/TetrECS.png").toExternalForm());
         ImageView imageView = new ImageView(titleImage);
@@ -55,6 +63,7 @@ public class MenuScene extends BaseScene {
         imageView.setFitHeight(150);
         imageView.setTranslateY(-150);
         menuPane.getChildren().add(imageView);
+
         //Animate Title
         RotateTransition rotateTransition = new RotateTransition(Duration.millis(5000), imageView);
         rotateTransition.setFromAngle(-10);
@@ -64,23 +73,29 @@ public class MenuScene extends BaseScene {
         rotateTransition.setInterpolator(Interpolator.EASE_BOTH);
         rotateTransition.setAutoReverse(true);
         rotateTransition.play();
+
         //Plays Background Music
-        this.multimedia.playMusic("menu.mp3");
+        this.multimedia.playBackgroundMusic("menu.mp3");
+
         //Menu Buttons
         var singlePlayer = new Button("Single Player");
         var multiPlayer = new Button("Multi Player");
         var instructions = new Button("How to Play");
         var exit = new Button("Exit");
+
         //Vbox to store and display all buttons
         var vbox = new VBox(10, singlePlayer, multiPlayer, instructions, exit);
         menuPane.getChildren().add(vbox);
+
         //Styles buttons
         vbox.getStyleClass().add("menuItem");
         vbox.setAlignment(Pos.BOTTOM_CENTER);
+
         singlePlayer.setBackground(null);
         multiPlayer.setBackground(null);
         instructions.setBackground(null);
         exit.setBackground(null);
+
         //Button Actions
         singlePlayer.setOnAction(this::startGame);
         multiPlayer.setOnAction(this::startMultiplayer);
@@ -88,6 +103,7 @@ public class MenuScene extends BaseScene {
         exit.setOnAction((ActionEvent event) -> {
             System.exit(0);
         });
+
         //Editing what happens when hover
         for (Node node: vbox.getChildren()) {
             node.hoverProperty().addListener((ov, oldValue, newValue) -> {
@@ -99,7 +115,9 @@ public class MenuScene extends BaseScene {
             });
             node.setStyle("-fx-text-fill: white");
         }
+
     }
+
     /**
      * Initialise the menu
      */
@@ -120,20 +138,27 @@ public class MenuScene extends BaseScene {
      */
     private void startGame(ActionEvent event) {
         gameWindow.startChallenge();
-        multimedia.playAudio("transition.wav");
+        multimedia.playSound("transition.wav");
         this.multimedia.stopBackground();
     }
 
+    /**
+     * Handle when the Multiplayer button is pressed
+     * @param event
+     */
     private void startMultiplayer(ActionEvent event) {
         gameWindow.startLobby();
-        multimedia.playAudio("transition.wav");
+        multimedia.playSound("transition.wav");
         multimedia.stopBackground();
     }
 
+    /**
+     * Handle when the Instructions button is pressed
+     * @param event
+     */
     private void startInstructions(ActionEvent event) {
-
         gameWindow.startInstructions();
-        multimedia.playAudio("transition.wav");
+        multimedia.playSound("transition.wav");
         multimedia.stopBackground();
     }
 }

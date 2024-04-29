@@ -5,7 +5,6 @@ import javafx.stage.Stage;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import uk.ac.soton.comp1206.ui.GameWindow;
 
 /**

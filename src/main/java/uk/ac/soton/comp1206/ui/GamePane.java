@@ -1,7 +1,7 @@
 package uk.ac.soton.comp1206.ui;
 
 import javafx.geometry.Pos;
-import javafx.scene.layout.*;
+import javafx.scene.layout.StackPane;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
 import org.apache.logging.log4j.LogManager;

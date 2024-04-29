@@ -6,32 +6,44 @@ import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Objects;
-
+/**
+ * The Multimedia Class is used to play any music or sound resource in every scene
+ */
 public class Multimedia {
     private static final Logger logger = LogManager.getLogger(Multimedia.class);
-    private static MediaPlayer backgroundPlayer;
-    private static MediaPlayer audioPlayer;
 
     /**
-     * Play background music
-     * @param music music name
+     * mediaPlayer is used to play sounds
      */
-    public void playMusic(String music) {
-        String toPlay = Multimedia.class.getResource("/music/" + music).toExternalForm();
+    private static MediaPlayer mediaPlayer;
+
+    /**
+     * backgroundPlayer is used to play and background music
+     */
+    private static MediaPlayer backgroundPlayer;
+
+    /**
+     * Uses the backgroundPlayer and plays the given music
+     * @param music music to be played
+     */
+    public void playBackgroundMusic(String music) {
+        String musicToBePlayed = Multimedia.class.getResource("/music/" + music).toExternalForm();
+        //uses the given string to find the wanted music to be played in the resources folder
         try {
-            Media play = new Media(toPlay);
+            Media play = new Media(musicToBePlayed);
             backgroundPlayer = new MediaPlayer(play);
 
-            backgroundPlayer.setAutoPlay(true);
+            backgroundPlayer.setAutoPlay(true); //Cycles Music Indefinetely
             backgroundPlayer.setCycleCount(MediaPlayer.INDEFINITE);
 
+            //Sets start and end of music to allow for loop
             Duration end = play.getDuration();
             backgroundPlayer.setStartTime(Duration.seconds(0));
             backgroundPlayer.setStopTime(end);
 
+            //Plays music
             backgroundPlayer.play();
-            logger.info("Playing background music: " + music);
+            logger.info("Playing Background Music: " + music);
         } catch(Exception e) {
             e.printStackTrace();
             logger.error(e.toString());
@@ -39,17 +51,19 @@ public class Multimedia {
     }
 
     /**
-     * Play audio effects
-     * @param sound sound name
+     * Uses the mediaPlayer and plays the given sound
+     * @param sound sound to be played
      */
-    public void playAudio(String sound) {
-        String toPlay = Objects.requireNonNull(Multimedia.class.getResource("resources/sounds/" + sound)).toExternalForm();
-        try {
-            Media play = new Media(toPlay);
-            audioPlayer = new MediaPlayer(play);
-            audioPlayer.play();
-            logger.info("Playing media sound" + sound);
+    public void playSound(String sound) {
+        String soundToPlay = Multimedia.class.getResource("/sounds/" + sound).toExternalForm();
+        //uses the given string to find the wanted sound to be played in the resources folder
 
+        try {
+            Media play = new Media(soundToPlay);
+            mediaPlayer = new MediaPlayer(play);
+
+            mediaPlayer.play();
+            logger.info("Playing Media Sound: " + sound);
         } catch(Exception e) {
             e.printStackTrace();
             logger.error(e.toString());
@@ -57,7 +71,7 @@ public class Multimedia {
     }
 
     /**
-     * Stopping background music
+     * Stops playing background Music
      */
     public void stopBackground() {
         backgroundPlayer.stop();

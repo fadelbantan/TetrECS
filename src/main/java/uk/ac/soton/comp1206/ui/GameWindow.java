@@ -9,10 +9,9 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.App;
+import uk.ac.soton.comp1206.game.Game;
 import uk.ac.soton.comp1206.network.Communicator;
 import uk.ac.soton.comp1206.scene.*;
-
-import uk.ac.soton.comp1206.game.Game;
 
 /**
  * The GameWindow is the single window for the game where everything takes place. To move between screens in the game,
@@ -61,6 +60,7 @@ public class GameWindow {
 
         //Go to menu
         startMenu();
+
     }
 
     /**
@@ -85,25 +85,31 @@ public class GameWindow {
     /**
      * Display the single player challenge
      */
-    public void startChallenge() { loadScene(new ChallengeScene(this)); }
+    public void startChallenge() {
+        loadScene(new ChallengeScene(this));
+    }
 
     /**
-     * Display the instructions scene
+     * Display the Instructions Scene
      */
     public void startInstructions() {
         loadScene(new InstructionsScene(this));
     }
 
     /**
-     * Display the scores scene
+     * Display the Scores Scene
      */
     public void startScores(Game game) {
         loadScene(new ScoresScene(this, game));
     }
 
+    /**
+     * Starts the Lobby Scene
+     */
     public void startLobby() {
         loadScene(new LobbyScene(this));
     }
+
 
     /**
      * Setup the default settings for the stage itself (the window), such as the title and minimum width and height.
@@ -180,4 +186,5 @@ public class GameWindow {
     public Communicator getCommunicator() {
         return communicator;
     }
+
 }

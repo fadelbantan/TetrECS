@@ -12,16 +12,21 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBoard;
 import uk.ac.soton.comp1206.game.GamePiece;
+import uk.ac.soton.comp1206.ui.Multimedia;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
-import uk.ac.soton.comp1206.ui.Multimedia;
 
-public class InstructionsScene extends BaseScene {
+/**
+ * The InstructionsScene shows the user the basic controls of the game and the pieces that can be played
+ */
+public class InstructionsScene extends BaseScene{
 
-    private static final Logger logger = LogManager.getLogger(InstructionsScene.class);
-
+    /**
+     * The Multimedia Class is used to play any music or sound resource
+     */
     protected Multimedia multimedia = new Multimedia();
 
+    private static final Logger logger = LogManager.getLogger(InstructionsScene.class);
 
     /**
      * Create a new scene, passing in the GameWindow the scene will be displayed in
@@ -32,17 +37,25 @@ public class InstructionsScene extends BaseScene {
         super(gameWindow);
         logger.info("Creating Instructions Scene");
     }
+
+    /**
+     * Initialise this scene. Called after creation
+     */
     @Override
     public void initialise() {
         //Escape Key Event
         scene.setOnKeyPressed(keyEvent -> {
             if(keyEvent.getCode() == KeyCode.ESCAPE) {
-                multimedia.playAudio("transition.wav");
+                multimedia.playSound("transition.wav");
                 gameWindow.startMenu();
                 logger.info("Escape Pressed");
             }
         });
     }
+
+    /**
+     * Build the layout of the scene
+     */
     @Override
     public void build() {
         logger.info("Building " + this.getClass().getName());
@@ -67,6 +80,7 @@ public class InstructionsScene extends BaseScene {
         instructions.setLayoutY(20);
         instructions.setLayoutX(400 - instructions.getLayoutBounds().getWidth());
 
+        //Pieces heading
         var pieces = new Text("Pieces");
         mainPane.getChildren().add(pieces);
         pieces.getStyleClass().add("heading");
@@ -103,22 +117,5 @@ public class InstructionsScene extends BaseScene {
         gridPane.setHgap(10);
     }
 
-    /**
-     * Creates the 15 game pieces' grids
-     */
-//    public void createDynamicPieces() {
-//        int i = 0;
-//        while (i <= 14) {
-//            int a = 0;
-//            while (a <= 4) {
-//                int b = 0;
-//                while (b <= 2) {
-//                    gridPane.add(new PieceBoard(GamePiece.createPiece(i), 50, 50), a, b);
-//                    i++;
-//                    b++;
-//                }
-//                a++;
-//            }
-//        }
-//    }
+
 }

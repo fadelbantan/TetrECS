@@ -3,7 +3,6 @@ package uk.ac.soton.comp1206.component;
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.*;
@@ -71,6 +70,8 @@ public class GameBlock extends Canvas {
 
     private Boolean center = false;
 
+    private boolean hover = false;
+
     /**
      * Create a new single Game Block
      * @param gameBoard the board this block belongs to
@@ -96,14 +97,6 @@ public class GameBlock extends Canvas {
         //When the value property is updated, call the internal updateValue method
         value.addListener(this::updateValue);
 
-        // TODO Added this last check
-        this.hoverProperty().addListener((ChangeListener<Boolean>) (observable, oldValue, newValue) -> {
-            if (newValue) {
-                paintCursor();
-            } else {
-                paint();
-            }
-        });
     }
 
     /**
@@ -126,12 +119,20 @@ public class GameBlock extends Canvas {
         } else {
             //If the block is not empty, paint with the colour represented by the value
             paintColor(COLOURS[value.get()]);
-        } if (center) {
+        } if (this.center) {
             // Paint center dot
             var gc = getGraphicsContext2D();
             gc.setStroke(Color.GREY);
             gc.fillOval(width/4, height/4, width/2, height/2);
         }
+        // If hover is true, then paint hover effect
+        if (this.hover) {
+            var gc = getGraphicsContext2D();
+
+            gc.setFill(Color.rgb(204, 204, 204, 0.4));
+            gc.fillRect(0, 0, width, height);
+        }
+
     }
 
     /**
@@ -170,9 +171,14 @@ public class GameBlock extends Canvas {
         gc.setStroke(Color.BLACK);
         gc.strokeRect(0,0,width,height);
 
-        //Triangle Fill
-        gc.setFill(Color.color(1,1, 1, 0.35));
-        gc.fillPolygon(new double[]{0.0, 0.0, width}, new double[]{0, height, height}, 3);
+        // Creates 3D effect on piece
+        gc.setFill(Color.rgb(59, 59, 59, 0.2));
+        gc.fillPolygon(new double[]{0, 0, width}, new double[]{0, height, height}, 3);
+        gc.setFill(Color.rgb(161, 161, 161, 0.3));
+        gc.fillRect(0, 0, 3, height);
+        gc.setFill(Color.rgb(255, 255, 255, 0.3));
+        gc.fillRect(0, 0, width, 3);
+
     }
 
     /**
@@ -229,8 +235,19 @@ public class GameBlock extends Canvas {
     }
 
     public void center() {
-        center = true;
+        this.center = true;
+        paint();
     }
+
+    /**
+     * Hover effect
+     * @param hover true if mouse is over board
+     */
+    public void hover(boolean hover) {
+        this.hover = hover;
+        paint();
+    }
+
 
     public void fadeOut() {
         animationTimer = new myAnimationTimer();
