@@ -105,6 +105,7 @@ public class Grid {
 
     /**
      * Returns whether a piece can be played in a given position
+     *
      * @param gamePiece A given GamePiece
      * @param placeX X Coordinate
      * @param placeY Y Coordinate
@@ -130,6 +131,7 @@ public class Grid {
 
     /**
      * Plays a given GamePiece by its centre in a given position
+     *
      * @param gamePiece A given GamePiece
      * @param placeX X Coordinate
      * @param placeY Y Coordinate
@@ -159,5 +161,4 @@ public class Grid {
             }
         }
     }
-
 }

@@ -107,7 +107,8 @@ public class MultiplayerScene extends ChallengeScene{
     @Override
     protected void keyboardInput(KeyEvent keyEvent) {
         super.keyboardInput(keyEvent);
-        if (keyEvent.getCode() == KeyCode.T) { //Opens Chat
+        //Opens Chat
+        if (keyEvent.getCode() == KeyCode.T) {
             if (!textField.isVisible()) {
                 textField.setVisible(true);
                 String message = textField.getText();
@@ -120,7 +121,8 @@ public class MultiplayerScene extends ChallengeScene{
                 textField.clear();
             }
         }
-        if (keyEvent.getCode() == KeyCode.ESCAPE) { //Exits scene
+        //Exits scene
+        if (keyEvent.getCode() == KeyCode.ESCAPE) {
             if (textField.isVisible()) {
                 textField.setVisible(false);
                 textField.clear();
@@ -232,7 +234,8 @@ public class MultiplayerScene extends ChallengeScene{
      * @param s message received from communicator
      */
     protected void listen(String s) {
-        if(s.contains("MSG")) { //chat message
+        //chat message
+        if(s.contains("MSG")) {
             s = s.replace("MSG ", "");
             String[] messageArr = s.split(":");
             if (messageArr.length > 1) {
@@ -240,7 +243,8 @@ public class MultiplayerScene extends ChallengeScene{
                 message.getStyleClass().add("messages Text");
                 messagesBox.getChildren().add(message);
             }
-        } else if (s.contains("SCORES")) { //Scores of all players in the game
+            //Scores of all players in the game
+        } else if (s.contains("SCORES")) {
             s = s.replace("SCORES ", "");
             String[] playerScoreLives = s.split("\n");
             this.multiplayerScores.clear();
@@ -249,10 +253,12 @@ public class MultiplayerScene extends ChallengeScene{
                 var entry = new Pair<String, Integer>(stats[0], Integer.parseInt(stats[1]));
                 this.multiplayerScores.add(entry);
             }
-        } else if(s.contains("DIE")) { //A player has lost or left
+            //A player has lost or left
+        } else if(s.contains("DIE")) {
             s = s.replace("DIE ", "");
             endUser(s);
-        } else if(s.contains(("BOARD"))) { //A representation of a player's GameBoard
+            //A representation of a player's GameBoard
+        } else if(s.contains(("BOARD"))) {
             s=s.replace("BOARD ", "");
             updatePlayerBoard(s);
         }

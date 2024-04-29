@@ -271,7 +271,8 @@ public class ScoresScene extends BaseScene {
         ArrayList<Pair<String, Integer>> scores = new ArrayList<>();
         File file = new File("scores.txt");
         try {
-            file.createNewFile(); // creates a new file
+            //Creates a new file
+            file.createNewFile();
 
             scores.add(new Pair<>("Fadel", 1000));
             scores.add(new Pair<>("Fadel", 900));
@@ -285,7 +286,8 @@ public class ScoresScene extends BaseScene {
 
             for (Pair pair : scores) {
                 String nameScore = pair.getKey() + ":" + pair.getValue();
-                localScoreList.add(pair); // adds score and name to the localscorelist as a pair
+                //Adds score and name to the localScoreList as a pair
+                localScoreList.add(pair);
                 bufferedWriter.write(nameScore);
                 bufferedWriter.write("\n");
             }
@@ -323,7 +325,7 @@ public class ScoresScene extends BaseScene {
     }
 
     /**
-     * Sends message to receive highscores from the server
+     * Sends message to receive high scores from the server
      */
     protected void loadOnlineScores() {
         communicator.send("HISCORES");
@@ -341,12 +343,15 @@ public class ScoresScene extends BaseScene {
      * @param message message received from communicator
      */
     protected void receiveCommunication(String message) {
-        if(message.contains("NEWSCORE")) { //server has received highscore
+        //server has received high score
+        if(message.contains("NEWSCORE")) {
             logger.info("Server received highscore");
-        } else if (message.contains("HISCORES")) { //Otherwise, the message is going to be received highscores from the server
+            //Otherwise, the message is going to be received highscores from the server
+        } else if (message.contains("HISCORES")) {
             message = message.replace("HISCORES", "");
             String[] pairs = message.split("\n");
-            for (String pair : pairs) { //adds scores and name to remoteScoresList
+            //adds scores and name to remoteScoresList
+            for (String pair : pairs) {
                 String[] scoreName = pair.split(":");
                 remoteScoresList.add(new Pair<>(scoreName[0], Integer.parseInt(scoreName[1])));
             }
@@ -358,8 +363,9 @@ public class ScoresScene extends BaseScene {
     }
 
     /**
-     * Starts the menu when the player leaves the scoresScene
-     * @param event
+     * Initiates the start menu action when player leaves the scores scene
+     *
+     * @param event The ActionEvent triggering the start menu
      */
     protected void startMenu(ActionEvent event) {
         gameWindow.startMenu();

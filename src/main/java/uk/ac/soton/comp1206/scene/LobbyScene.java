@@ -64,7 +64,7 @@ public class LobbyScene extends BaseScene {
     protected Button startGame;
 
     /**
-     * Contains all of the functions available when the player has joined a channel
+     * Contains all the functions available when the player has joined a channel
      */
     protected VBox channelBox;
 
@@ -114,7 +114,8 @@ public class LobbyScene extends BaseScene {
     @Override
     public void initialise() {
         timer = new Timer();
-        this.scene.setOnKeyPressed(keyEvent -> { //Leaves the game and channel when escape is pressed
+        //Leaves the game and channel when escape is pressed
+        this.scene.setOnKeyPressed(keyEvent -> {
             if(keyEvent.getCode() == KeyCode.ESCAPE) {
                 multimedia.playSound("transition.wav");
                 multimedia.stopBackground();
@@ -128,7 +129,8 @@ public class LobbyScene extends BaseScene {
             public void run() {
                 Platform.runLater(() -> communicator.send("LIST"));
             }
-        },1000, 3000); //searches for new channels every 3 seconds
+            //searches for new channels every 3 seconds
+        },1000, 3000);
         communicator = gameWindow.getCommunicator();
         //Listens for messages from communicator and handles the command
         communicator.addListener(message -> Platform.runLater(() -> listen(message.trim())));
@@ -213,11 +215,11 @@ public class LobbyScene extends BaseScene {
         channelBox.setMaxHeight(gameWindow.getHeight());
         channelBox.getStyleClass().add("gameBox");
 
-        //All of the messages are contained within this borderpane
+        //All the messages are contained within this borderpane
         var messagesPane = new BorderPane();
         messagesPane.setPrefSize(gameWindow.getWidth()/2, gameWindow.getHeight()/2);
 
-        //Scrollpane allows for chat to scroll down
+        //Scroll pane allows for chat to scroll down
         var currentMessages = new ScrollPane();
         currentMessages.getStyleClass().add("scroller");
         currentMessages.setPrefSize(messagesPane.getWidth(), messagesPane.getHeight()-100);
@@ -236,7 +238,8 @@ public class LobbyScene extends BaseScene {
         currentMessages.setContent(messagesBox);
         messagesPane.setCenter(currentMessages);
 
-        var messageEntry = new TextField(); // allows for messages to be entered
+        // allows for messages to be entered
+        var messageEntry = new TextField();
         messageEntry.getStyleClass().add("TextField");
         var messageConfirm = new Button("Send"); // send button
 
@@ -275,7 +278,7 @@ public class LobbyScene extends BaseScene {
             }
         });
 
-        //initialises gridpane of players
+        //initialises gridPane of players
         players = new GridPane();
         players.setPrefWidth(currentMessages.getPrefWidth());
 
@@ -309,7 +312,6 @@ public class LobbyScene extends BaseScene {
             }
             node.setBackground(null);
         }
-
         channelUI.getChildren().addAll(startChannel, channelNames);
     }
 
@@ -318,7 +320,8 @@ public class LobbyScene extends BaseScene {
      * @param s message from communicator
      */
     protected void listen(String s) {
-        if (s.contains("CHANNELS")) { //displays all channels available
+        //displays all channels available
+        if (s.contains("CHANNELS")) {
             channelNames.getChildren().clear();
             s = s.replace("CHANNELS ", "");
             String[] channelArray = s.split("\n");
@@ -344,10 +347,12 @@ public class LobbyScene extends BaseScene {
                 textChannel.getStyleClass().add("channelItem");
                 channelNames.getChildren().add(textChannel);
             }
-        } else if (s.contains("JOIN")) { //Joining channel
+            //Joining channel
+        } else if (s.contains("JOIN")) {
             String[] channelName = s.split(" ");
             channelJoin(channelName[1]);
-        } else if(s.contains("MSG")) {//displays a new message
+            //displays a new message
+        } else if(s.contains("MSG")) {
             s = s.replace("MSG ", "");
             String[] messageArr = s.split(":");
             if(messageArr.length > 1) {
@@ -355,14 +360,17 @@ public class LobbyScene extends BaseScene {
                 message.getStyleClass().add("messages Text");
                 messagesBox.getChildren().add(message);
             }
-        } else if (s.contains("HOST")) {//player is now host of the channel
+            //player is now host of the channel
+        } else if (s.contains("HOST")) {
             startGame.setVisible(true);
         } else if (s.contains("USERS")){
             s=s.replace("USERS ", "");
             setPlayers(s);
-        } else if(s.contains("START")){//starts the game
+            //starts the game
+        } else if(s.contains("START")){
             startMultiplayer();
-        } else if(s.contains("NICK")) {//detects when the player changes their nickname
+            //detects when the player changes their nickname
+        } else if(s.contains("NICK")) {
             s=s.replace("NICK ", "");
             name = s;
         }

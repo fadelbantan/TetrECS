@@ -92,6 +92,7 @@ public class ChallengeScene extends BaseScene {
 
     /**
      * Create a new Single Player challenge scene
+     *
      * @param gameWindow the Game Window
      */
     public ChallengeScene(GameWindow gameWindow) {
@@ -110,7 +111,7 @@ public class ChallengeScene extends BaseScene {
 
         this.scene = gameWindow.getScene();
 
-        root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
+        root = new GamePane(gameWindow.getWidth(), gameWindow.getHeight());
 
         var challengePane = new StackPane();
         challengePane.setMaxWidth(gameWindow.getWidth());
@@ -170,11 +171,11 @@ public class ChallengeScene extends BaseScene {
         highScoreBox.setTranslateX(22.5);
 
         //Current Piece preview
-        pieceBoard = new GameBoard(3,3,100,100);
+        pieceBoard = new GameBoard(3, 3, 100, 100);
         pieceBoard.setAlignment(Pos.CENTER);
 
         //Following Piece preview
-        followingPieceBoard = new GameBoard(3,3,75,75);
+        followingPieceBoard = new GameBoard(3, 3, 75, 75);
         followingPieceBoard.setAlignment(Pos.CENTER);
         pieceBoard.setTranslateY(-10);
         pieceBoard.setTranslateX(12.5);
@@ -197,7 +198,7 @@ public class ChallengeScene extends BaseScene {
         mainPane.setTop(timerPane);
         timerPane.setAlignment(Pos.TOP_LEFT);
 
-        board = new GameBoard(game.getGrid(),gameWindow.getWidth()/2,gameWindow.getWidth()/2);
+        board = new GameBoard(game.getGrid(), gameWindow.getWidth() / 2, gameWindow.getWidth() / 2);
         mainPane.setCenter(board);
 
         //Handle block on Gameboard grid being clicked
@@ -234,11 +235,12 @@ public class ChallengeScene extends BaseScene {
 
     /**
      * Handle when a block is clicked
+     *
      * @param gameBlock the Game Block that was clocked
      */
     protected void blockClicked(GameBlock gameBlock) {
         boolean piecePlayed = game.blockClicked(gameBlock);
-        if(piecePlayed) {
+        if (piecePlayed) {
             multimedia.playSound("place.wav");
             game.restartLoop();
         } else {
@@ -271,7 +273,8 @@ public class ChallengeScene extends BaseScene {
 
     /**
      * changes the "PieceBoards" to display the correct current and following pieces
-     * @param gamePiece current GamePiece
+     *
+     * @param gamePiece          current GamePiece
      * @param followingGamePiece following GamePiece
      */
     protected void nextPiece(GamePiece gamePiece, GamePiece followingGamePiece) {
@@ -281,6 +284,7 @@ public class ChallengeScene extends BaseScene {
 
     /**
      * Rotates the given piece clockwise
+     *
      * @param gameBlock The GameBlock to be rotated
      */
     protected void rotate(GameBlock gameBlock) {
@@ -296,10 +300,11 @@ public class ChallengeScene extends BaseScene {
 
     /**
      * Uses the game's rotate method to rotate pieces and update pieceboards
+     *
      * @param rotations Number of Rotations Clockwise
      */
     protected void rotate(int rotations) {
-        for(int x = 0; x< rotations; x++) {
+        for (int x = 0; x < rotations; x++) {
             game.rotateCurrentPiece();
         }
         pieceBoard.pieceToDisplay(game.getCurrentPiece());
@@ -308,6 +313,7 @@ public class ChallengeScene extends BaseScene {
 
     /**
      * Swaps the current and following pieces
+     *
      * @param gameBlock GameBlock that detected Swap
      */
     protected void swapPieces(GameBlock gameBlock) {
@@ -326,63 +332,75 @@ public class ChallengeScene extends BaseScene {
 
     /**
      * Handles keyboard input
+     *
      * @param keyEvent Keyboard Input
      */
     protected void keyboardInput(KeyEvent keyEvent) {
         int oldBlockX = blockX;
         int oldBlockY = blockY;
         boolean moved = false;
-        if(keyEvent.getCode() == KeyCode.ESCAPE) { //Exits frame
+        if (keyEvent.getCode() == KeyCode.ESCAPE) { //Exits frame
             gameEnd();
-            if(!(game instanceof MultiplayerGame)) {
+            if (!(game instanceof MultiplayerGame)) {
                 gameWindow.startMenu();
             }
             logger.info("Escape Pressed");
-        } else if(keyEvent.getCode() == KeyCode.Q || keyEvent.getCode() == KeyCode.Z || keyEvent.getCode() == KeyCode.OPEN_BRACKET) {
-            rotateLeft(); //Rotates the current piece left
-        } else if (keyEvent.getCode() == KeyCode.E || keyEvent.getCode() == KeyCode.C || keyEvent.getCode() == KeyCode.CLOSE_BRACKET ) {
-            rotate(1); // Rotates the current piece right
-        } else if(keyEvent.getCode() == KeyCode.SPACE || keyEvent.getCode() == KeyCode.R) {
-            swapPieces();  //Swaps the current and following pieces
-        } else if(keyEvent.getCode() == KeyCode.ENTER || keyEvent.getCode() == KeyCode.X) {
-            blockClicked(board.getBlock(blockX, blockY)); //Clicks piece
-        } else if(keyEvent.getCode() == KeyCode.W || keyEvent.getCode() == KeyCode.UP) { // Moves cursor up
-            if(blockY>0) {
-                blockY-=1;
+            //Rotates the current piece left
+        } else if (keyEvent.getCode() == KeyCode.Q || keyEvent.getCode() == KeyCode.Z || keyEvent.getCode() == KeyCode.OPEN_BRACKET) {
+            rotateLeft();
+            // Rotates the current piece right
+        } else if (keyEvent.getCode() == KeyCode.E || keyEvent.getCode() == KeyCode.C || keyEvent.getCode() == KeyCode.CLOSE_BRACKET) {
+            rotate(1);
+            //Swaps the current and following pieces
+        } else if (keyEvent.getCode() == KeyCode.SPACE || keyEvent.getCode() == KeyCode.R) {
+            swapPieces();
+            //Clicks piece
+        } else if (keyEvent.getCode() == KeyCode.ENTER || keyEvent.getCode() == KeyCode.X) {
+            blockClicked(board.getBlock(blockX, blockY));
+            // Moves cursor up
+        } else if (keyEvent.getCode() == KeyCode.W || keyEvent.getCode() == KeyCode.UP) {
+            if (blockY > 0) {
+                blockY -= 1;
                 moved = true;
             } else {
                 multimedia.playSound("fail.wav");
             }
-        } else if(keyEvent.getCode() == KeyCode.D || keyEvent.getCode() == KeyCode.RIGHT) { // Moves cursor right
-            if(blockX<4) {
-                blockX+=1;
+            //Moves cursor right
+        } else if (keyEvent.getCode() == KeyCode.D || keyEvent.getCode() == KeyCode.RIGHT) {
+            if (blockX < 4) {
+                blockX += 1;
                 moved = true;
             } else {
                 multimedia.playSound("fail.wav");
             }
-        } else if(keyEvent.getCode() == KeyCode.S || keyEvent.getCode() == KeyCode.DOWN) { // Moves cursor down
-            if(blockY<4) {
-                blockY+=1;
+            //Moves cursor down
+        } else if (keyEvent.getCode() == KeyCode.S || keyEvent.getCode() == KeyCode.DOWN) {
+            if (blockY < 4) {
+                blockY += 1;
                 moved = true;
             } else {
-            multimedia.playSound("fail.wav");
+                multimedia.playSound("fail.wav");
             }
-        } else if(keyEvent.getCode() == KeyCode.A|| keyEvent.getCode() == KeyCode.LEFT) { // Moves cursor left
-            if(blockX>0) {
-                blockX-=1;
+            //Moves cursor left
+        } else if (keyEvent.getCode() == KeyCode.A || keyEvent.getCode() == KeyCode.LEFT) {
+            if (blockX > 0) {
+                blockX -= 1;
                 moved = true;
             } else {
                 multimedia.playSound("fail.wav");
             }
         }
-        if(moved) {
-            board.getBlock(oldBlockX, oldBlockY).resetCursor(); //Removes cursor from previous grid position
-            board.getBlock(blockX, blockY).paintCursor(); //Adds cursor to current grid position
+        if (moved) {
+            //Removes cursor from previous grid position
+            board.getBlock(oldBlockX, oldBlockY).resetCursor();
+            //Adds cursor to current grid position
+            board.getBlock(blockX, blockY).paintCursor();
         }
     }
 
     /**
      * When a line has been cleared, an animation is played on a set of given GameBlockCoordinates
+     *
      * @param gameBlockCoordinates A Set of Coordinates for a grid
      */
     protected void lineClear(Set<GameBlockCoordinate> gameBlockCoordinates) {
@@ -392,6 +410,7 @@ public class ChallengeScene extends BaseScene {
 
     /**
      * Sets the timer for the next turn
+     *
      * @param delay Representing how long the timer will last.
      */
     protected void gameLoop(int delay) {
@@ -404,7 +423,8 @@ public class ChallengeScene extends BaseScene {
      * Ends the game
      */
     protected void gameEnd() {
-        if(!(game instanceof MultiplayerGame)) { //Ends game only if the game is a challenge scene game
+        //Ends game only if the game is a challenge scene game
+        if (!(game instanceof MultiplayerGame)) {
             logger.info("Game Over");
             timer.setVisible(false);
             game.endGame();
@@ -414,19 +434,21 @@ public class ChallengeScene extends BaseScene {
     }
 
     /**
-     * Creates a new timer animation, which fades from green to yellow to red depending on time left
-     * @param delay
-     * @return
+     * Creates a Timeline object to animate the timer, transitioning its color from green to yellow
+     * to red based on the remaining time
+     *
+     * @param delay The delay for the timer animation
+     * @return The created Timeline object
      */
     private Timeline createTimeLine(int delay) {
         Timeline timeline = new Timeline(new KeyFrame(Duration.ZERO, new KeyValue(timer.fillProperty(), Color.GREEN)));
         timeline.getKeyFrames().add(new KeyFrame(Duration.ZERO, new KeyValue(timer.widthProperty(), timer.getWidth())));
 
-        timeline.getKeyFrames().add(new KeyFrame(Duration.millis(delay*0.5), new KeyValue(timer.fillProperty(), Color.YELLOW)));
-        timeline.getKeyFrames().add(new KeyFrame(Duration.millis(delay*0.5), new KeyValue(timer.widthProperty(), timer.getWidth()*0.75)));
+        timeline.getKeyFrames().add(new KeyFrame(Duration.millis(delay * 0.5), new KeyValue(timer.fillProperty(), Color.YELLOW)));
+        timeline.getKeyFrames().add(new KeyFrame(Duration.millis(delay * 0.5), new KeyValue(timer.widthProperty(), timer.getWidth() * 0.75)));
 
-        timeline.getKeyFrames().add(new KeyFrame(Duration.millis(delay*0.75), new KeyValue(timer.fillProperty(), Color.RED)));
-        timeline.getKeyFrames().add(new KeyFrame(Duration.millis(delay*0.75), new KeyValue(timer.widthProperty(), timer.getWidth()*0.5)));
+        timeline.getKeyFrames().add(new KeyFrame(Duration.millis(delay * 0.75), new KeyValue(timer.fillProperty(), Color.RED)));
+        timeline.getKeyFrames().add(new KeyFrame(Duration.millis(delay * 0.75), new KeyValue(timer.widthProperty(), timer.getWidth() * 0.5)));
 
         timeline.getKeyFrames().add(new KeyFrame(Duration.millis(delay), new KeyValue(timer.widthProperty(), 0)));
 
@@ -434,18 +456,19 @@ public class ChallengeScene extends BaseScene {
     }
 
     /**
-     * Updates highscore when the player's score has changed
-     * @param observable
-     * @param oldValue
-     * @param newValue
+     * Updates high score when the player's score has changed
+     *
+     * @param observable The observable value being monitored
+     * @param oldValue The old value of the observable
+     * @param newValue The new value of the observable
      */
     protected void getHighScore(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
         initialHighscore();
     }
 
     /**
-     * Checks local file if there is a high score, otherwise it will set the highscore to be the current score if it is
-     * higher
+     * Checks local file if there is a high score, otherwise it will set the high score to be the current score
+     * if it is higher
      */
     protected void initialHighscore() {
         File file = new File("scores.txt");
@@ -470,11 +493,10 @@ public class ChallengeScene extends BaseScene {
             e.printStackTrace();
             logger.error("Error when finding highscore");
         }
-        if(game.scoreProperty().get() > highScore) {
+        if (game.scoreProperty().get() > highScore) {
             highScoreValue.set(game.scoreProperty().get());
         } else {
             highScoreValue.set(highScore);
         }
     }
-
 }

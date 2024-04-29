@@ -169,13 +169,14 @@ public class Game {
     }
 
     /**
-     * Handels what should happen after a piece is palyed
+     * Handles what should happen after a piece is played
      */
     public void afterPiece() {
         int lines = 0;
         HashSet<GameBlockCoordinate> blocksToBeCleared = new HashSet<>();
 
-        for(int x=0; x < cols; x++) { //Vertical Lines
+        // Vertical Lines
+        for(int x=0; x < cols; x++) {
             int countX = 0;
             for(int y=0; y < rows; y++) {
                 if(grid.get(x,y) == 0) break;
@@ -185,12 +186,14 @@ public class Game {
                 lines+=1;
                 for(int y=0; y < rows; y++) {
                     GameBlockCoordinate coordinate = new GameBlockCoordinate(x,y);
-                    blocksToBeCleared.add(coordinate); //Add all GameBlockCoordinates to HashSet to be cleared
+                    // Add all GameBlockCoordinates to HashSet to be cleared
+                    blocksToBeCleared.add(coordinate);
                 }
             }
         }
 
-        for(int y=0; y < rows; y++) {//Horizontal Lines
+        // Horizontal Lines
+        for(int y=0; y < rows; y++) {
             int countY = 0;
             for(int x=0; x < cols; x++) {
                 if(grid.get(x,y) == 0) break;
@@ -200,26 +203,34 @@ public class Game {
                 lines+=1;
                 for(int x=0; x < cols; x++) {
                     GameBlockCoordinate coordinate = new GameBlockCoordinate(x,y);
-                    blocksToBeCleared.add(coordinate);//Add all GameBlockCoordinates to HashSet to be cleared
+                    // Add all GameBlockCoordinates to HashSet to be cleared
+                    blocksToBeCleared.add(coordinate);
                 }
             }
         }
 
-        if(lines>0){ //If there is a line to clear
-            clear(blocksToBeCleared); // Clears Blocks
-            score(lines, blocksToBeCleared.size()); // Increments Score
-            this.multiplier.set(this.multiplier.add(1).get()); // Increments Multiplier
+        // If there is a line to clear
+        if(lines>0){
+            // Clears Blocks
+            clear(blocksToBeCleared);
+            // Increments Score
+            score(lines, blocksToBeCleared.size());
+            this.multiplier.set(this.multiplier.add(1).get());
+            // Increments Multiplier
             if(lineClearListener != null) {
-                lineClearListener.lineClear(blocksToBeCleared); //Calls Listener
+                lineClearListener.lineClear(blocksToBeCleared);
+                //Calls Listener
                 logger.info("Clear Lines");
             }
         } else {
-            this.multiplier.set(1); //Resets Multiplier
+            //Resets Multiplier
+            this.multiplier.set(1);
         }
     }
 
     /**
      * Iterates through a given HashSet of GameBlockCoordinates and clears the GameBlock
+     *
      * @param blocks A HashSet Of Blocks to be set to 0
      */
     public void clear(HashSet<GameBlockCoordinate> blocks) {
@@ -231,6 +242,7 @@ public class Game {
     /**
      * Increases the Score depending on the number of lines and blocks cleared.
      * Also increments Level every 1000 points
+     *
      * @param lines Number of Lines Cleared
      * @param blocks Number of Blocks Cleared
      */
@@ -247,6 +259,7 @@ public class Game {
 
     /**
      * Get the grid model inside this game representing the game state of the board
+     *
      * @return game grid model
      */
     public Grid getGrid() {
@@ -255,6 +268,7 @@ public class Game {
 
     /**
      * Get the number of columns in this game
+     *
      * @return number of columns
      */
     public int getCols() {
@@ -263,6 +277,7 @@ public class Game {
 
     /**
      * Get the number of rows in this game
+     *
      * @return number of rows
      */
     public int getRows() {
@@ -271,6 +286,7 @@ public class Game {
 
     /**
      * Creates a new Random Piece
+     *
      * @return A new GamePiece
      */
     public GamePiece spawnPiece() {
@@ -289,18 +305,38 @@ public class Game {
         nextPieceListener.nextPiece(currentPiece, followingPiece);
     }
 
+    /**
+     * Sets the listener for receiving notifications about the next game piece
+     *
+     * @param nextPieceListener The listener for next piece events
+     */
     public void setNextPieceListener(NextPieceListener nextPieceListener) {
         this.nextPieceListener = nextPieceListener;
     }
 
+    /**
+     * Sets the listener for receiving line clear events
+     *
+     * @param lineClearListener The listener for line clear events
+     */
     public void setLineClearListener(LineClearListener lineClearListener) {
         this.lineClearListener = lineClearListener;
     }
 
+    /**
+     * Sets the listener for receiving game loop events
+     *
+     * @param gameLoopListener The listener for game loop events
+     */
     public void setOnGameLoop(GameLoopListener gameLoopListener) {
         this.gameLoopListener = gameLoopListener;
     }
 
+    /**
+     *Sets the listener for receiving game end events
+     *
+     * @param gameEndListener The listener for game end events
+     */
     public void setGameEndListener(GameEndListener gameEndListener) {
         this.gameEndListener = gameEndListener;
     }
@@ -323,6 +359,7 @@ public class Game {
 
     /**
      * Returns the currentPiece
+     *
      * @return currentPiece
      */
     public GamePiece getCurrentPiece() {
@@ -331,6 +368,7 @@ public class Game {
 
     /**
      * Returns the followingPiece
+     *
      * @return followingPiece
      */
     public GamePiece getFollowingPiece() {
@@ -339,6 +377,7 @@ public class Game {
 
     /**
      * Returns the timerDelay, which is calculated based on level
+     *
      * @return How long th timer should last in ms
      */
     public int getTimerDelay() {
@@ -347,7 +386,7 @@ public class Game {
     }
 
     /**
-     * Triggers GameLopp when the player does not play a piece
+     * Triggers GameLoop when the player does not play a piece
      */
     public void gameLoop() {
         nextPiece();

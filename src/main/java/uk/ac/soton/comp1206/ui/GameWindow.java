@@ -16,7 +16,7 @@ import uk.ac.soton.comp1206.scene.*;
 /**
  * The GameWindow is the single window for the game where everything takes place. To move between screens in the game,
  * we simply change the scene.
- *
+
  * The GameWindow has methods to launch each of the different parts of the game by switching scenes. You can add more
  * methods here to add more screens to the game.
  */
@@ -64,7 +64,7 @@ public class GameWindow {
     }
 
     /**
-     * Setup the font and any other resources we need
+     * Set up the font and any other resources we need
      */
     private void setupResources() {
         logger.info("Loading resources");
@@ -112,7 +112,7 @@ public class GameWindow {
 
 
     /**
-     * Setup the default settings for the stage itself (the window), such as the title and minimum width and height.
+     * Set up the default settings for the stage itself (the window), such as the title and minimum width and height.
      */
     public void setupStage() {
         stage.setTitle("TetrECS");
@@ -140,7 +140,7 @@ public class GameWindow {
     }
 
     /**
-     * Setup the default scene (an empty black scene) when no scene is loaded
+     * Set up the default scene (an empty black scene) when no scene is loaded
      */
     public void setupDefaultScene() {
         this.scene = new Scene(new Pane(),width,height, Color.BLACK);
@@ -186,5 +186,4 @@ public class GameWindow {
     public Communicator getCommunicator() {
         return communicator;
     }
-
 }

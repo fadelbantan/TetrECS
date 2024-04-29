@@ -115,7 +115,6 @@ public class MenuScene extends BaseScene {
             });
             node.setStyle("-fx-text-fill: white");
         }
-
     }
 
     /**

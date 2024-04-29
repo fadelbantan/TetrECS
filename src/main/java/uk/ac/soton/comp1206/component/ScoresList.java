@@ -14,14 +14,12 @@ import javafx.util.Pair;
 import java.util.ArrayList;
 
 /**
- * A ScoresList will hold and display a list of names and associated scores.
- * It extends VBox to show a list of scores.
- * It is bound to an observable list property, which when it is updated, will update the localScores list property in
- * ScoresList, creating a leaderboard.
+ *The ScoresList class represents a graphical component for displaying scores of players.
+ * It extends VBox and provides functionality to render and animate score items.
  */
 public class ScoresList extends VBox {
     /**
-     * All Scores of players
+     * The scores of all players
      */
     protected SimpleListProperty<Pair<String, Integer>> localScores = new SimpleListProperty<>();
 
@@ -36,11 +34,11 @@ public class ScoresList extends VBox {
     }
 
     /**
-     * Listener Method
-     * Renders the new scores given to the localScores list
-     * @param observableValue
-     * @param oldVal
-     * @param newVal
+     * Updates the scores based on changes in the observable value
+     *
+     * @param observableValue The observable value being monitored
+     * @param oldVal The old value of the observable list
+     * @param newVal The new value of the observable list
      */
     protected void updateScores(ObservableValue<?  extends ObservableList<Pair<String, Integer>>> observableValue, ObservableList<Pair<String, Integer>> oldVal,  ObservableList<Pair<String, Integer>> newVal) {
         this.renderScores(newVal);
@@ -49,6 +47,7 @@ public class ScoresList extends VBox {
     /**
      * renderScores will first clear the VBox, then iterate through the given List, creating a Text item that will
      * display the name of the player and their score, then animating the text item.
+     *
      * @param scores List of scores of all players
      */
     protected void renderScores(ObservableList<Pair<String, Integer>> scores) {
@@ -57,22 +56,24 @@ public class ScoresList extends VBox {
         for(Pair pair: scores) {
             Text scoreItem = new Text(pair.getKey() + " - " + pair.getValue());
             if(multiplayerPlayers.contains(pair.getKey())) {
-                scoreItem.getStyleClass().add("scorelistStrike");
+                scoreItem.getStyleClass().add("scoreListStrike");
             } else {
-                scoreItem.getStyleClass().add("scorelist");
+                scoreItem.getStyleClass().add("scoreList");
             }
             this.getChildren().add(scoreItem);
             this.reveal(scoreItem);
             x++;
-            if(x==11){ //Only shows the top 10 scores
+            // This to only show the top 10 scores
+            if(x==11){
                 break;
             }
         }
     }
 
     /**
-     * Animates the given Text item to fade in once, and then remain shown to the user
-     * @param item Text Node to be animated
+     * Animates the given text item to fade in once, and then remain shown to the user
+     *
+     * @param item Text to be animated
      */
     protected void reveal(Text item) {
         FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1), item);
@@ -85,6 +86,7 @@ public class ScoresList extends VBox {
 
     /**
      * Returns the SimpleListProperty so that it can be bound to
+     *
      * @return localScores
      */
     public ListProperty<Pair<String, Integer>> listProperty() {
@@ -94,18 +96,18 @@ public class ScoresList extends VBox {
     /**
      * Takes the given string and searches for a pair that contains that string, then changes style class of the
      * Text item to have a strikethrough.
-     * @param item
+     *
+     * @param item The string to be searched for in the pairs.
      */
     public void strikeThrough(String item) {
         int x = 0;
         this.multiplayerPlayers.add(item);
         for (Pair pair: localScores) {
             if(pair.getKey().equals(item)){
-                this.getChildren().get(x).getStyleClass().add("scorelistStrike");
+                this.getChildren().get(x).getStyleClass().add("scoreListStrike");
             } else {
                 x++;
             }
         }
     }
-
 }

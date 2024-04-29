@@ -30,6 +30,7 @@ public class GamePiece {
 
     /**
      * Create a new GamePiece of the specified piece number
+     *
      * @param piece piece number
      * @return the created GamePiece
      */
@@ -125,14 +126,14 @@ public class GamePiece {
                 return new GamePiece("Double", blocks, 15);
             }
         }
-
         //Not a valid piece number
         throw new IndexOutOfBoundsException("No such piece: " + piece);
     }
 
     /**
      * Create a new GamePiece of the specified piece number and rotation
-     * @param piece piece number
+     *
+     * @param piece    piece number
      * @param rotation number of times to rotate
      * @return the created GamePiece
      */
@@ -146,9 +147,10 @@ public class GamePiece {
     /**
      * Create a new GamePiece with the given name, block makeup and value. Should not be called directly, only via the
      * factory.
-     * @param name name of the piece
+     *
+     * @param name   name of the piece
      * @param blocks block makeup of the piece
-     * @param value the value of this piece
+     * @param value  the value of this piece
      */
     private GamePiece(String name, int[][] blocks, int value) {
         this.name = name;
@@ -156,24 +158,18 @@ public class GamePiece {
         this.value = value;
 
         //Use the shape of the block to create a grid with either 0 (empty) or the value of this shape for each block.
-        for(int x = 0; x < blocks.length; x++) {
+        for (int x = 0; x < blocks.length; x++) {
             for (int y = 0; y < blocks[x].length; y++) {
-                if(blocks[x][y] == 0) continue;
+                if (blocks[x][y] == 0) continue;
                 blocks[x][y] = value;
             }
         }
     }
 
-    /**
-     * Get the value of this piece
-     * @return piece value
-     */
-    public int getValue() {
-        return value;
-    }
 
     /**
      * Get the block makeup of this piece
+     *
      * @return 2D grid of the blocks representing the piece shape
      */
     public int[][] getBlocks() {
@@ -182,16 +178,17 @@ public class GamePiece {
 
     /**
      * Rotate this piece the given number of rotations
+     *
      * @param rotations number of rotations
      */
     public void rotate(int rotations) {
-        for(int rotated = 0; rotated < rotations; rotated ++) {
+        for (int rotated = 0; rotated < rotations; rotated++) {
             rotate();
         }
     }
 
     /**
-     * Rotate this piece exactly once by rotating it's 3x3 grid
+     * Rotate this piece exactly once by rotating its 3x3 grid
      */
     public void rotate() {
         int[][] rotated = new int[blocks.length][blocks[0].length];
@@ -210,15 +207,12 @@ public class GamePiece {
         blocks = rotated;
     }
 
-
     /**
      * Return the string representation of this piece
+     *
      * @return the name of this piece
      */
     public String toString() {
         return this.name;
     }
-
-
-
 }
